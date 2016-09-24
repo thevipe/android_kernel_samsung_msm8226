@@ -15,7 +15,10 @@
 #define ISP_STATS_STREAM_BIT  0x80000000
 
 #define MSM_VFE_REG_CFG_FRAME_ID_NOT_MATCH_ERROR	0xCACFC
+<<<<<<< HEAD
 
+=======
+>>>>>>> e5668c1... media: camera_v2: update driver
 enum ISP_START_PIXEL_PATTERN {
 	ISP_BAYER_RGRGRG,
 	ISP_BAYER_GRGRGR,
@@ -261,6 +264,8 @@ enum msm_vfe_reg_cfg_type {
 	VFE_READ_DMI_16BIT,
 	VFE_READ_DMI_32BIT,
 	VFE_READ_DMI_64BIT,
+	GET_SOC_HW_VER,
+	GET_MAX_CLK_RATE,
 };
 
 struct msm_vfe_cfg_cmd2 {
@@ -268,6 +273,7 @@ struct msm_vfe_cfg_cmd2 {
 	uint16_t cmd_len;
 	uint32_t frame_id;
 	void __user *cfg_data;
+	uint32_t frame_id;
 	void __user *cfg_cmd;
 };
 

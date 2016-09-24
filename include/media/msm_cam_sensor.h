@@ -40,7 +40,7 @@
 #define NUM_ACTUATOR_DIR 2
 #define MAX_ACTUATOR_SCENARIO 8
 #define MAX_ACTUATOR_REGION 5
-#define MAX_ACTUATOR_INIT_SET 12
+#define MAX_ACTUATOR_INIT_SET 50 //12
 #define MAX_ACTUATOR_REG_TBL_SIZE 8
 #define MAX_ACTUATOR_AF_TOTAL_STEPS 1024
 
@@ -49,10 +49,12 @@
 #define MSM_ACTUATOR_MOVE_SIGNED_FAR -1
 #define MSM_ACTUATOR_MOVE_SIGNED_NEAR  1
 
-#define MAX_EEPROM_NAME 32
+#define MSM_ACTUATOR_MOVE_SIGNED_FAR -1
+#define MSM_ACTUATOR_MOVE_SIGNED_NEAR  1
 
 #define MAX_EEPROM_NAME 32
 
+#define MAX_AF_ITERATIONS 3
 #define MAX_NUMBER_OF_STEPS 47
 
 //#define COMPANION_STATS2_LENGTH 432
@@ -96,6 +98,7 @@ enum msm_sensor_power_seq_gpio_t {
 	SENSOR_GPIO_STANDBY,
 	SENSOR_GPIO_EXT_VANA_POWER,
 	SENSOR_GPIO_EXT_VIO_POWER,
+<<<<<<< HEAD
 	SENSOR_GPIO_COMP,
 	SENSOR_GPIO_COMPRSTN,
 	SENSOR_GPIO_TORCH_EN,
@@ -105,6 +108,12 @@ enum msm_sensor_power_seq_gpio_t {
 	SENSOR_GPIO_VT_STANDBY,
 	SENSOR_GPIO_VT_VIO,
 	SENSOR_GPIO_VT_VDIG,
+=======
+	SENSOR_GPIO_EXT_VCORE_POWER,
+	SENSOR_GPIO_EXT_CAMIO_EN,
+	SENSOR_GPIO_EXT_VAF_POWER,
+	SENSOR_GPIO_MIPI_CHANGE,
+>>>>>>> e5668c1... media: camera_v2: update driver
 	SENSOR_GPIO_MAX,
 };
 
@@ -608,6 +617,12 @@ struct msm_actuator_cfg_data {
 enum msm_actuator_write_type {
 	MSM_ACTUATOR_WRITE_HW_DAMP,
 	MSM_ACTUATOR_WRITE_DAC,
+	MSM_ACTUATOR_WRITE_DAC_SEQ,
+};
+
+enum msm_actuator_init_focus_type{
+  MSM_ACTUATOR_INIT_FOCUS_DELAY = 0xDD,
+  MSM_ACTUATOR_INIT_FOCUS_READ_STATUS = 0xDC,  
 };
 
 struct msm_actuator_reg_params_t {
@@ -624,6 +639,9 @@ enum msm_camera_led_config_t {
 	MSM_CAMERA_LED_HIGH,
 	MSM_CAMERA_LED_INIT,
 	MSM_CAMERA_LED_RELEASE,
+#if defined(CONFIG_MACH_VICTORLTE_CTC) || defined(CONFIG_SEC_MEGA2_PROJECT)
+	MSM_CAMERA_LED_FACTORY = 8,
+#endif
 };
 
 struct msm_camera_led_cfg_t {
@@ -642,6 +660,32 @@ struct sensor_init_cfg_data {
 	} cfg;
 };
 
+<<<<<<< HEAD
+=======
+struct ioctl_native_cmd {
+        unsigned short mode;
+        unsigned short address;
+        unsigned short value_1;
+        unsigned short value_2;
+        unsigned short value_3;
+};
+
+typedef struct
+{
+	unsigned short iso;
+	unsigned short shutterspeed;
+	unsigned short isFlashOn;
+} exif_data_t;
+
+enum sensor_af_e {
+	SENSOR_AF_CANCEL = 1,
+	SENSOR_AF_START,
+	SENSOR_AF_PRE_FLASH_ON,
+	SENSOR_AF_PRE_FLASH_OFF,
+	SENSOR_AF_PRE_FLASH_AE_STABLE,
+};
+
+>>>>>>> e5668c1... media: camera_v2: update driver
 #define VIDIOC_MSM_SENSOR_CFG \
 	_IOWR('V', BASE_VIDIOC_PRIVATE + 1, struct sensorb_cfg_data)
 
