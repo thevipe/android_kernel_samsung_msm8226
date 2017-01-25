@@ -566,17 +566,10 @@ CONFIG_CRYPTO_CRYPTD=y
 # Bluetooth deconfig
 #
 CONFIG_BT=y
-# CONFIG_BT_RFCOMM=y is not set
-# CONFIG_BT_RFCOMM_TTY=y is not set
-# CONFIG_BT_BNEP=y is not set
-# CONFIG_BT_BNEP_MC_FILTER=y is not set
-# CONFIG_BT_BNEP_PROTO_FILTER=y is not set
+# CONFIG_BT_RFCOMM is not set
+# CONFIG_BT_BNEP is not set
 CONFIG_BT_HIDP=y
-CONFIG_HID_SUPPORT=y
-CONFIG_HIDRAW=y
-# CONFIG_BT_HCISMD=y is not set
-# CONFIG_BT_HCIUART=y is not set
-# CONFIG_BT_HCIUART_H4=y is not set
+
 
 # Special HID drivers
 CONFIG_HID_A4TECH=y
