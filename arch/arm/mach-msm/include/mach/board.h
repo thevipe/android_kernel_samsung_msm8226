@@ -27,6 +27,12 @@
 #include <linux/msm_ssbi.h>
 #include <mach/msm_bus.h>
 
+#define WLAN_RF_REG_ADDR_START_OFFSET   0x3
+#define WLAN_RF_REG_DATA_START_OFFSET   0xf
+#define WLAN_RF_READ_REG_CMD            0x3
+#define WLAN_RF_WRITE_REG_CMD           0x2
+#define WLAN_RF_READ_CMD_MASK           0x3fff
+
 struct msm_camera_io_ext {
 	uint32_t mdcphy;
 	uint32_t mdcsz;
@@ -682,5 +688,21 @@ void msm_snddev_tx_route_config(void);
 void msm_snddev_tx_route_deconfig(void);
 
 extern phys_addr_t msm_shared_ram_phys; /* defined in arch/arm/mach-msm/io.c */
+
+u32 wcnss_rf_read_reg(u32 rf_reg_addr);
+
+#if defined(CONFIG_BT_BCM4335) || defined(CONFIG_BT_BCM4339)
+void msm8974_bt_init(void);
+#endif
+
+#if defined(CONFIG_BCM4335) || defined(CONFIG_BCM4335_MODULE) || \
+    defined(CONFIG_BCM4339) || defined(CONFIG_BCM4339_MODULE) || \
+    defined(CONFIG_BCM4354) || defined(CONFIG_BCM4354_MODULE)
+int brcm_wlan_init(void);
+int brcm_wifi_status_register(
+	void (*callback)(int card_present, void *dev_id),
+	void *dev_id, void *mmc_host);
+unsigned int brcm_wifi_status(struct device *dev);
+#endif
 
 #endif
