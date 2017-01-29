@@ -36,7 +36,6 @@
 		qcom,isdb-gpio-irq = <&pma8084_gpios 11 0>;
 		qcom,isdb-gpio-i2c_sda = <&msmgpio 2 0>;
 		qcom,isdb-gpio-i2c_scl = <&msmgpio 3 0>;
-		qcom,isdb-gpio-tmm_sw = <&msmgpio 115 0>;
 		qcom,isdb-bbm-xtal-freq = <26000>;
 	};
 
