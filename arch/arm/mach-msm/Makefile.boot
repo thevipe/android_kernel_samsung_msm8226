@@ -339,6 +339,37 @@ endif
 #	 dtb-$(CONFIG_ARCH_MSM8226)	+= apq8026-v2-720p-mtp.dtb
 #	 dtb-$(CONFIG_ARCH_MSM8226)	+= apq8026-v2-1080p-mtp.dtb
 #	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8226-v1-mtp-r01.dtb
+ifneq ($(TW_VERSION),)
+ifeq ($(CONFIG_SEC_MATISSE_PROJECT),y)
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8226-sec-matisse3g-r00.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8226-sec-matisse3g-r01.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8226-sec-matisse3g-r02.dtb
+     dtb-$(CONFIG_ARCH_MSM8226) += msm8226-sec-matissewifi-r00.dtb
+     dtb-$(CONFIG_ARCH_MSM8226) += msm8226-sec-matissewifi-r01.dtb
+     dtb-$(CONFIG_ARCH_MSM8226) += msm8226-sec-matissewifi-r02.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226) += msm8226-sec-matissewifi-r03.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8926-sec-matisselte-r00.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8926-sec-matisselte-r01.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8926-sec-matisselte-r02.dtb
+else ifeq ($(CONFIG_SEC_MILLET_PROJECT),y)
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8226-sec-millet3geur-r02.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8226-sec-millet3geur-r03.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8226-sec-millet3geur-r04.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8226-sec-millet3geur-r05.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8226-sec-millet3geur-r06.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8226-sec-milletwifieur-r00.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8226-sec-milletwifieur-r01.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8226-sec-milletwifieur-r02.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8226-sec-milletwifieur-r03.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8226-sec-milletwifieur-r04.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226) += msm8226-sec-milletwifieur-r05.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8926-sec-milletlte-r00.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8926-sec-milletlte-r01.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8926-sec-milletlte-r02.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8926-sec-milletlte-r03.dtb
+	 dtb-$(CONFIG_ARCH_MSM8226)	+= msm8926-sec-milletlte-r04.dtb
+endif
+endif
 ifeq ($(CONFIG_MACH_MILLET3G_CHN_OPEN),y)
          dtb-$(CONFIG_ARCH_MSM8226)	+= msm8226-sec-millet3g-chn-open-r00.dtb
 else ifeq ($(CONFIG_MACH_MILLET3G_EUR),y)
