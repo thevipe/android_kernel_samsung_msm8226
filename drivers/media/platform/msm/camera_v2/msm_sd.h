@@ -18,6 +18,19 @@
 
 /* NOTE: this header file should ONLY be included by subdev drivers */
 
+#ifndef EEPROM_CAM_FW
+  #if defined(CONFIG_MACH_ATLANTIC3GEUR_OPEN) ||\
+      defined(CONFIG_MACH_ATLANTICLTE_ATT) ||\
+	defined(CONFIG_SEC_HESTIA_PROJECT) ||\
+	defined(CONFIG_MACH_MEGA2LTE_KTT) ||\
+	defined(CONFIG_MACH_VASTALTE_CHN_CMCC_DUOS)
+
+         #define EEPROM_CAM_FW
+         #define EEPROM_FW_OFFSET 48
+         #define EEPROM_FW_SIZE 11
+  #endif
+#endif
+
 struct msm_sd_close_ioctl {
 	unsigned int session;
 	unsigned int stream;
@@ -66,11 +79,11 @@ struct msm_sd_req_sd {
 struct msm_sd_req_vb2_q {
 	struct vb2_buffer *(*get_buf)(int session_id, unsigned int stream_id);
 	struct vb2_queue *(*get_vb2_queue)(int session_id,
-					   unsigned int stream_id);
+		unsigned int stream_id);
 	int (*put_buf)(struct vb2_buffer *vb2_buf, int session_id,
-		       unsigned int stream_id);
+		unsigned int stream_id);
 	int (*buf_done)(struct vb2_buffer *vb2_buf, int session_id,
-			unsigned int stream_id);
+		unsigned int stream_id);
 };
 
 #define MSM_SD_NOTIFY_GET_SD 0x00000001
@@ -80,7 +93,7 @@ struct msm_sd_req_vb2_q {
 int msm_sd_register(struct msm_sd_subdev *msm_subdev);
 int msm_sd_unregister(struct msm_sd_subdev *sd);
 struct v4l2_subdev *msm_sd_get_subdev(struct v4l2_subdev *sd,
-				      const char *get_name);
+	const char *get_name);
 void msm_sd_put_subdev(struct v4l2_subdev *sd, struct v4l2_subdev *put);
 
 #endif /*_MSM_SD_H */
