@@ -102,9 +102,12 @@
 			qcom,cool-bat-mv = <4100>;
 			qcom,ibatmax-cool-ma = <350>;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 			pm8226_chg_chgr: qcom,chgr@1000 {
 =======
+=======
+>>>>>>> a4be9bc... dtb
 			qcom,ovp-monitor-en = <1>;
 			sec,imax-ta = <1000>;
 			sec,imax-usb = <500>;
@@ -138,6 +141,9 @@
 			sec,sleep-update-time = <300>;
 
 			qcom,chgr@1000 {
+<<<<<<< HEAD
+>>>>>>> a4be9bc... dtb
+=======
 >>>>>>> a4be9bc... dtb
 				status = "disabled";
 				reg = <0x1000 0x100>;
