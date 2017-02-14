@@ -50,8 +50,17 @@
 #define CPP_CMD_TIMEOUT_MS 300
 #define MSM_CPP_MAX_TIMEOUT_TRIAL 10
 
+<<<<<<< HEAD
 #define MSM_CPP_NOMINAL_CLOCK 266670000
 #define MSM_CPP_TURBO_CLOCK 320000000
+=======
+#if defined (CONFIG_SEC_S_PROJECT)
+#define MSM_CPP_NOMINAL_CLOCK 266670000//320000000
+#else
+#define MSM_CPP_NOMINAL_CLOCK 320000000
+#endif
+#define MSM_CPP_TURBO_CLOCK 465000000
+>>>>>>> 670a5e9... Revert "misc: Import SM-G900F kernel source code"
 
 
 typedef struct _msm_cpp_timer_data_t {
@@ -1281,6 +1290,7 @@ static int msm_cpp_cfg(struct cpp_device *cpp_dev,
 	int32_t *ret_status = 0;
 
 	int i = 0;
+
 	if (!new_frame) {
 		pr_err("Insufficient memory. return\n");
 		return -ENOMEM;
@@ -1380,16 +1390,26 @@ static int msm_cpp_cfg(struct cpp_device *cpp_dev,
 	}
   
 	num_stripes = ((cpp_frame_msg[12] >> 20) & 0x3FF) +
+<<<<<<< HEAD
 		((cpp_frame_msg[12] >> 10) & 0x3FF) +
 		(cpp_frame_msg[12] & 0x3FF);
 
 	fw_version_1_2_x = 0;
 	if (cpp_dev->hw_info.cpp_hw_version == 0x10010000 ||
             cpp_dev->hw_info.cpp_hw_version == 0x20000000) {
+=======
+		      ((cpp_frame_msg[12] >> 10) & 0x3FF) +
+		      (cpp_frame_msg[12] & 0x3FF);
+
+	fw_version_1_2_x = 0;
+	if ((cpp_dev->hw_info.cpp_hw_version == CPP_HW_VERSION_1_1_0) ||
+	    (cpp_dev->hw_info.cpp_hw_version == CPP_HW_VERSION_1_1_1)) {
+>>>>>>> 670a5e9... Revert "misc: Import SM-G900F kernel source code"
 		fw_version_1_2_x = 2;
 	}
 	for (i = 0; i < num_stripes; i++) {
 		cpp_frame_msg[(133 + fw_version_1_2_x) + i * 27] +=
+<<<<<<< HEAD
 			(uint32_t) in_phyaddr;
 		cpp_frame_msg[(139 + fw_version_1_2_x) + i * 27] +=
 			(uint32_t) out_phyaddr0;
@@ -1399,6 +1419,17 @@ static int msm_cpp_cfg(struct cpp_device *cpp_dev,
 			(uint32_t) out_phyaddr0;
 		cpp_frame_msg[(142 + fw_version_1_2_x) + i * 27] +=
 			(uint32_t) out_phyaddr1;
+=======
+			(uint32_t)in_phyaddr;
+		cpp_frame_msg[(139 + fw_version_1_2_x) + i * 27] +=
+			(uint32_t)out_phyaddr0;
+		cpp_frame_msg[(140 + fw_version_1_2_x) + i * 27] +=
+			(uint32_t)out_phyaddr1;
+		cpp_frame_msg[(141 + fw_version_1_2_x) + i * 27] +=
+			(uint32_t)out_phyaddr0;
+		cpp_frame_msg[(142 + fw_version_1_2_x) + i * 27] +=
+			(uint32_t)out_phyaddr1;
+>>>>>>> 670a5e9... Revert "misc: Import SM-G900F kernel source code"
 	}
 
 	frame_qcmd = kzalloc(sizeof(struct msm_queue_cmd), GFP_KERNEL);

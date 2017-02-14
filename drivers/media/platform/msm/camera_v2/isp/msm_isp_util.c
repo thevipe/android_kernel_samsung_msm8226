@@ -880,6 +880,7 @@ int msm_isp_get_bit_per_pixel(uint32_t output_format)
 void msm_isp_update_error_frame_count(struct vfe_device *vfe_dev)
 {
 	struct msm_vfe_error_info *error_info = &vfe_dev->error_info;
+
 	error_info->info_dump_frame_count++;
 	if (error_info->info_dump_frame_count == 0)
 		error_info->info_dump_frame_count++;
@@ -1149,8 +1150,14 @@ void msm_isp_do_tasklet(unsigned long data)
 void msm_isp_set_src_state(struct vfe_device *vfe_dev, void *arg)
 {
 	struct msm_vfe_axi_src_state *src_state = arg;
+<<<<<<< HEAD
 	vfe_dev->axi_data.src_info[src_state->input_src].active =
 	src_state->src_active;
+=======
+
+	vfe_dev->axi_data.src_info[src_state->input_src].active =
+		src_state->src_active;
+>>>>>>> 670a5e9... Revert "misc: Import SM-G900F kernel source code"
 }
 
 int msm_isp_open_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
