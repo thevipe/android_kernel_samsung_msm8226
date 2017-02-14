@@ -74,7 +74,8 @@
 
 		qcom,vbif-settings = <0x004 0x00000001>,
 				     <0x0D8 0x00000707>,
-				     <0x124 0x00000003>;
+				     <0x124 0x00000003>,
+				     <0x0C0 0x02101010>;
 		qcom,mdp-settings = <0x02E0 0x000000A5>,
 				    <0x02E4 0x00000055>,
 				    <0x03AC 0xC0000CCC>,
@@ -117,6 +118,7 @@
 		reg-names = "dsi_ctrl", "dsi_phy", "mmss_misc_phys";
 		qcom,mdss-fb-map = <&mdss_fb0>;
 		qcom,mdss-mdp = <&mdss_mdp>;
+<<<<<<< HEAD
 		vdd-supply = <&pm8226_l15>;
 		vddio-supply = <&pm8226_l8>;
 		vdda-supply = <&pm8226_l4>;
@@ -163,6 +165,8 @@
 			qcom,supply-pre-off-sleep = <0>;
 			qcom,supply-post-off-sleep = <0>;
 		};
+=======
+>>>>>>> a4be9bc... dtb
 	};
 
 	qcom,mdss_wb_panel {
@@ -172,5 +176,3 @@
 		qcom,mdss-fb-map = <&mdss_fb1>;
 	};
 };
-
-/include/ "msm8226-mdss-panels.dtsi"
