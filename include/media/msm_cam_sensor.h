@@ -46,6 +46,7 @@
 #define MOVE_FAR  1
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 #define MSM_ACTUATOR_MOVE_SIGNED_FAR -1
 #define MSM_ACTUATOR_MOVE_SIGNED_NEAR  1
@@ -55,6 +56,10 @@
 #define MSM_ACTUATOR_MOVE_SIGNED_NEAR  1
 =======
 >>>>>>> 670a5e9... Revert "misc: Import SM-G900F kernel source code"
+=======
+#define MSM_ACTUATOR_MOVE_SIGNED_FAR -1
+#define MSM_ACTUATOR_MOVE_SIGNED_NEAR  1
+>>>>>>> 6112a6d... Revert "Revert "misc: Import SM-G900F kernel source code""
 
 #define MAX_EEPROM_NAME 32
 

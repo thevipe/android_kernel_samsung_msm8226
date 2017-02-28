@@ -384,9 +384,13 @@ static void msm_ispif_enable_intf_cids(struct ispif_device *ispif,
 		data |=  (uint32_t) cid_mask;
 	else
 <<<<<<< HEAD
+<<<<<<< HEAD
 		data &= ~cid_mask;
 <<<<<<< HEAD
 =======
+=======
+		data &= ~((uint32_t) cid_mask);
+>>>>>>> 6112a6d... Revert "Revert "misc: Import SM-G900F kernel source code""
 =======
 		data &= ~((uint32_t) cid_mask);
 >>>>>>> 6112a6d... Revert "Revert "misc: Import SM-G900F kernel source code""
