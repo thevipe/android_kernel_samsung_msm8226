@@ -289,23 +289,23 @@ static void msm_ispif_sel_csid_core(struct ispif_device *ispif,
 	switch (intftype) {
 	case PIX0:
 		data &= ~(BIT(1) | BIT(0));
-		data |= csid;
+		data |= (uint32_t) csid;
 		break;
 	case RDI0:
 		data &= ~(BIT(5) | BIT(4));
-		data |= (csid << 4);
+		data |= ((uint32_t) csid) << 4;
 		break;
 	case PIX1:
 		data &= ~(BIT(9) | BIT(8));
-		data |= (csid << 8);
+		data |= ((uint32_t) csid) << 8;
 		break;
 	case RDI1:
 		data &= ~(BIT(13) | BIT(12));
-		data |= (csid << 12);
+		data |= ((uint32_t) csid) << 12;
 		break;
 	case RDI2:
 		data &= ~(BIT(21) | BIT(20));
-		data |= (csid << 20);
+		data |= ((uint32_t) csid) << 20;
 		break;
 	}
 
@@ -381,11 +381,15 @@ static void msm_ispif_enable_intf_cids(struct ispif_device *ispif,
 
 	data = msm_camera_io_r(ispif->base + intf_addr);
 	if (enable)
-		data |= cid_mask;
+		data |=  (uint32_t) cid_mask;
 	else
+<<<<<<< HEAD
 		data &= ~cid_mask;
 <<<<<<< HEAD
 =======
+=======
+		data &= ~((uint32_t) cid_mask);
+>>>>>>> 6112a6d... Revert "Revert "misc: Import SM-G900F kernel source code""
 	pr_err("%s: <DBG01> vfe_intf %u intftype %u intf_addr %x data %x\n", __func__,
 	       vfe_intf, intftype, intf_addr, data);
 >>>>>>> 670a5e9... Revert "misc: Import SM-G900F kernel source code"

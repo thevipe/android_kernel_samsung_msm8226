@@ -1,4 +1,4 @@
-/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2011-2015, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -187,7 +187,7 @@ int32_t msm_camera_cci_i2c_write_seq(struct msm_camera_i2c_client *client,
 	int32_t rc = -EFAULT;
 	uint32_t i = 0;
 	struct msm_camera_cci_ctrl cci_ctrl;
-	struct msm_camera_i2c_reg_array reg_conf_tbl[num_byte];
+	struct msm_camera_i2c_reg_array *reg_conf_tbl = NULL;
 
 	if ((client->addr_type != MSM_CAMERA_I2C_BYTE_ADDR
 		&& client->addr_type != MSM_CAMERA_I2C_WORD_ADDR)
@@ -195,6 +195,7 @@ int32_t msm_camera_cci_i2c_write_seq(struct msm_camera_i2c_client *client,
 		return rc;
 
 	S_I2C_DBG("%s reg addr = 0x%x num bytes: %d\n",
+<<<<<<< HEAD
 <<<<<<< HEAD
 			  __func__, addr, num_byte);
 	memset(reg_conf_tbl, 0,
@@ -204,6 +205,17 @@ int32_t msm_camera_cci_i2c_write_seq(struct msm_camera_i2c_client *client,
 	memset(reg_conf_tbl, 0,
 	       num_byte * sizeof(struct msm_camera_i2c_reg_array));
 >>>>>>> 670a5e9... Revert "misc: Import SM-G900F kernel source code"
+=======
+		__func__, addr, num_byte);
+
+	reg_conf_tbl = kzalloc(num_byte *
+		(sizeof(struct msm_camera_i2c_reg_array)), GFP_KERNEL);
+	if (!reg_conf_tbl) {
+		pr_err("%s:%d no memory\n", __func__, __LINE__);
+		return -ENOMEM;
+	}
+
+>>>>>>> 6112a6d... Revert "Revert "misc: Import SM-G900F kernel source code""
 	reg_conf_tbl[0].reg_addr = addr;
 	for (i = 0; i < num_byte; i++) {
 		reg_conf_tbl[i].reg_data = data[i];
@@ -221,6 +233,8 @@ int32_t msm_camera_cci_i2c_write_seq(struct msm_camera_i2c_client *client,
 	CDBG("%s line %d rc = %d\n", __func__, __LINE__, rc);
 	rc = cci_ctrl.status;
 	rc = 0;
+	kfree(reg_conf_tbl);
+	reg_conf_tbl = NULL;
 	return rc;
 }
 
