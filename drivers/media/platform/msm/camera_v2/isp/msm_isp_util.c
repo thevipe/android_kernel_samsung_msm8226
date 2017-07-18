@@ -1154,30 +1154,25 @@ void msm_isp_do_tasklet(unsigned long data)
 int msm_isp_set_src_state(struct vfe_device *vfe_dev, void *arg)
 {
 	struct msm_vfe_axi_src_state *src_state = arg;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 	vfe_dev->axi_data.src_info[src_state->input_src].active =
 	src_state->src_active;
-=======
 
 	vfe_dev->axi_data.src_info[src_state->input_src].active =
 		src_state->src_active;
->>>>>>> 670a5e9... Revert "misc: Import SM-G900F kernel source code"
-=======
+		
 	if (src_state->input_src >= VFE_SRC_MAX)
 		return -EINVAL;
 	vfe_dev->axi_data.src_info[src_state->input_src].active =
 	src_state->src_active;
 	return 0;
->>>>>>> 6112a6d... Revert "Revert "misc: Import SM-G900F kernel source code""
-=======
+
 	if (src_state->input_src >= VFE_SRC_MAX)
 		return -EINVAL;
 	vfe_dev->axi_data.src_info[src_state->input_src].active =
 	src_state->src_active;
 	return 0;
->>>>>>> 6112a6d... Revert "Revert "misc: Import SM-G900F kernel source code""
+
 }
 
 int msm_isp_open_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)

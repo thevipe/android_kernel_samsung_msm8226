@@ -45,19 +45,14 @@
 #define MOVE_NEAR 0
 #define MOVE_FAR  1
 
-=======
 #define MSM_ACTUATOR_MOVE_SIGNED_FAR -1
 #define MSM_ACTUATOR_MOVE_SIGNED_NEAR  1
 
-
-#define MSM_ACTUATOR_MOVE_SIGNED_FAR -1
-#define MSM_ACTUATOR_MOVE_SIGNED_NEAR  1
-=======
-
-=======
 #define MSM_ACTUATOR_MOVE_SIGNED_FAR -1
 #define MSM_ACTUATOR_MOVE_SIGNED_NEAR  1
 
+#define MSM_ACTUATOR_MOVE_SIGNED_FAR -1
+#define MSM_ACTUATOR_MOVE_SIGNED_NEAR  1
 
 #define MAX_EEPROM_NAME 32
 
@@ -332,12 +327,63 @@ enum cci_i2c_master_t {
 	MASTER_MAX,
 };
 
+struct msm_camera_i2c_read_config {
+	uint16_t slave_addr;
+	uint16_t reg_addr;
+	enum msm_camera_i2c_data_type data_type;
+	uint16_t *data;
+};
+
+struct msm_camera_csi2_params {
+	struct msm_camera_csid_params csid_params;
+	struct msm_camera_csiphy_params csiphy_params;
+};
+
+struct msm_camera_csi_lane_params {
+	uint16_t csi_lane_assign;
+	uint16_t csi_lane_mask;
+};
+
+struct csi_lane_params_t {
+	uint16_t csi_lane_assign;
+	uint8_t csi_lane_mask;
+	uint8_t csi_if;
+	uint8_t csid_core[2];
+	uint8_t csi_phy_sel;
+};
+
+
 struct msm_sensor_info_t {
 	char     sensor_name[MAX_SENSOR_NAME];
 	int32_t  session_id;
 	int32_t  subdev_id[SUB_MODULE_MAX];
 	uint8_t  is_mount_angle_valid;
 	uint32_t sensor_mount_angle;
+};
+
+struct camera_vreg_t {
+	const char *reg_name;
+	enum camera_vreg_type type;
+	int min_voltage;
+	int max_voltage;
+	int op_mode;
+	uint32_t delay;
+};
+
+struct sensorb_cfg_data {
+	int cfgtype;
+	union {
+		struct msm_sensor_info_t      sensor_info;
+		void                         *setting;
+	} cfg;
+};
+
+struct csid_cfg_data {
+	enum csid_cfg_type_t cfgtype;
+	union {
+		uint32_t csid_version;
+		struct msm_camera_csid_params *csid_params;
+	} cfg;
 };
 
 struct msm_camera_sensor_slave_info {
@@ -386,13 +432,6 @@ struct msm_camera_i2c_seq_reg_setting {
 	uint16_t delay;
 };
 
-struct msm_camera_i2c_read_config {
-	uint16_t slave_addr;
-	uint16_t reg_addr;
-	enum msm_camera_i2c_data_type data_type;
-	uint16_t *data;
-};
-
 struct msm_camera_csid_vc_cfg {
 	uint8_t cid;
 	uint8_t dt;
@@ -419,33 +458,6 @@ struct msm_camera_csiphy_params {
 	uint8_t csid_core;
 };
 
-struct msm_camera_csi2_params {
-	struct msm_camera_csid_params csid_params;
-	struct msm_camera_csiphy_params csiphy_params;
-};
-
-struct msm_camera_csi_lane_params {
-	uint16_t csi_lane_assign;
-	uint16_t csi_lane_mask;
-};
-
-struct csi_lane_params_t {
-	uint16_t csi_lane_assign;
-	uint8_t csi_lane_mask;
-	uint8_t csi_if;
-	uint8_t csid_core[2];
-	uint8_t csi_phy_sel;
-};
-
-struct camera_vreg_t {
-	const char *reg_name;
-	enum camera_vreg_type type;
-	int min_voltage;
-	int max_voltage;
-	int op_mode;
-	uint32_t delay;
-};
-
 enum camb_position_t {
 	BACK_CAMERA_B,
 	FRONT_CAMERA_B,
@@ -454,22 +466,6 @@ enum camb_position_t {
 enum camerab_mode_t {
 	CAMERA_MODE_2D_B = (1<<0),
 	CAMERA_MODE_3D_B = (1<<1)
-};
-
-struct sensorb_cfg_data {
-	int cfgtype;
-	union {
-		struct msm_sensor_info_t      sensor_info;
-		void                         *setting;
-	} cfg;
-};
-
-struct csid_cfg_data {
-	enum csid_cfg_type_t cfgtype;
-	union {
-		uint32_t csid_version;
-		struct msm_camera_csid_params *csid_params;
-	} cfg;
 };
 
 struct csiphy_cfg_data {
