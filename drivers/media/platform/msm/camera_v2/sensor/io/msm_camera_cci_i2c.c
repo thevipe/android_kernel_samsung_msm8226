@@ -195,20 +195,12 @@ int32_t msm_camera_cci_i2c_write_seq(struct msm_camera_i2c_client *client,
 		return rc;
 
 	S_I2C_DBG("%s reg addr = 0x%x num bytes: %d\n",
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 			  __func__, addr, num_byte);
 	memset(reg_conf_tbl, 0,
 		num_byte * sizeof(struct msm_camera_i2c_reg_array));
-=======
 		  __func__, addr, num_byte);
 	memset(reg_conf_tbl, 0,
 	       num_byte * sizeof(struct msm_camera_i2c_reg_array));
->>>>>>> 670a5e9... Revert "misc: Import SM-G900F kernel source code"
-=======
-=======
->>>>>>> 6112a6d... Revert "Revert "misc: Import SM-G900F kernel source code""
 		__func__, addr, num_byte);
 
 	reg_conf_tbl = kzalloc(num_byte *
@@ -218,10 +210,6 @@ int32_t msm_camera_cci_i2c_write_seq(struct msm_camera_i2c_client *client,
 		return -ENOMEM;
 	}
 
-<<<<<<< HEAD
->>>>>>> 6112a6d... Revert "Revert "misc: Import SM-G900F kernel source code""
-=======
->>>>>>> 6112a6d... Revert "Revert "misc: Import SM-G900F kernel source code""
 	reg_conf_tbl[0].reg_addr = addr;
 	for (i = 0; i < num_byte; i++) {
 		reg_conf_tbl[i].reg_data = data[i];
