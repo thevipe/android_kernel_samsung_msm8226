@@ -383,11 +383,20 @@ static void msm_ispif_enable_intf_cids(struct ispif_device *ispif,
 	if (enable)
 		data |=  (uint32_t) cid_mask;
 	else
+<<<<<<< HEAD
+<<<<<<< HEAD
 		data &= ~cid_mask;
+<<<<<<< HEAD
+=======
+=======
 		data &= ~((uint32_t) cid_mask);
+>>>>>>> 6112a6d... Revert "Revert "misc: Import SM-G900F kernel source code""
+=======
 		data &= ~((uint32_t) cid_mask);
+>>>>>>> 6112a6d... Revert "Revert "misc: Import SM-G900F kernel source code""
 	pr_err("%s: <DBG01> vfe_intf %u intftype %u intf_addr %x data %x\n", __func__,
 	       vfe_intf, intftype, intf_addr, data);
+>>>>>>> 670a5e9... Revert "misc: Import SM-G900F kernel source code"
 	msm_camera_io_w_mb(data, ispif->base + intf_addr);
 }
 

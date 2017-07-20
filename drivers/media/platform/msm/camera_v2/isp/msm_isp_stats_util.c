@@ -156,12 +156,25 @@ int msm_isp_stats_create_stream(struct vfe_device *vfe_dev,
 	}
 
 	stats_idx = vfe_dev->hw_info->vfe_ops.stats_ops.
+<<<<<<< HEAD
 		get_stats_idx(stream_req_cmd->stats_type);
+=======
+		    get_stats_idx(stream_req_cmd->stats_type);
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 670a5e9... Revert "misc: Import SM-G900F kernel source code"
+=======
+=======
+>>>>>>> 6112a6d... Revert "Revert "misc: Import SM-G900F kernel source code""
 			
 	if (stats_idx >= vfe_dev->hw_info->stats_hw_info->num_stats_type) {
 		pr_err("%s Invalid stats index %d", __func__, stats_idx);
 		return -EINVAL;
 	}			
+<<<<<<< HEAD
+>>>>>>> 6112a6d... Revert "Revert "misc: Import SM-G900F kernel source code""
+=======
+>>>>>>> 6112a6d... Revert "Revert "misc: Import SM-G900F kernel source code""
 
 	stream_info = &stats_data->stream_info[stats_idx];
 	if (stream_info->state != STATS_AVALIABLE) {
