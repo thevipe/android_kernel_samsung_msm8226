@@ -1405,7 +1405,6 @@ static int msm_cpp_cfg(struct cpp_device *cpp_dev,
 	num_stripes = ((cpp_frame_msg[12] >> 20) & 0x3FF) +
 		((cpp_frame_msg[12] >> 10) & 0x3FF) +
 		(cpp_frame_msg[12] & 0x3FF);
-
 	fw_version_1_2_x = 0;
 	if (cpp_dev->hw_info.cpp_hw_version == 0x10010000) {
 		fw_version_1_2_x = 2;
