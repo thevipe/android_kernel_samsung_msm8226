@@ -118,8 +118,6 @@
 		reg-names = "dsi_ctrl", "dsi_phy", "mmss_misc_phys";
 		qcom,mdss-fb-map = <&mdss_fb0>;
 		qcom,mdss-mdp = <&mdss_mdp>;
-<<<<<<< HEAD
-<<<<<<< HEAD
 		vdd-supply = <&pm8226_l15>;
 		vddio-supply = <&pm8226_l8>;
 		vdda-supply = <&pm8226_l4>;
@@ -166,10 +164,6 @@
 			qcom,supply-pre-off-sleep = <0>;
 			qcom,supply-post-off-sleep = <0>;
 		};
-=======
->>>>>>> a4be9bc... dtb
-=======
->>>>>>> a4be9bc... dtb
 	};
 
 	qcom,mdss_wb_panel {
