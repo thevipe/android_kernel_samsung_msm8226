@@ -1405,10 +1405,13 @@ static int msm_cpp_cfg(struct cpp_device *cpp_dev,
 	num_stripes = ((cpp_frame_msg[12] >> 20) & 0x3FF) +
 		((cpp_frame_msg[12] >> 10) & 0x3FF) +
 		(cpp_frame_msg[12] & 0x3FF);
+
 	fw_version_1_2_x = 0;
-	if (cpp_dev->hw_info.cpp_hw_version == 0x10010000) {
+	if ((cpp_dev->hw_info.cpp_hw_version == CPP_HW_VERSION_1_1_0) ||
+		(cpp_dev->hw_info.cpp_hw_version == CPP_HW_VERSION_1_1_1) ||
+		(cpp_dev->hw_info.cpp_hw_version == CPP_HW_VERSION_2_0_0))
 		fw_version_1_2_x = 2;
-	}
+
 	for (i = 0; i < num_stripes; i++) {
 		cpp_frame_msg[(133 + fw_version_1_2_x) + i * 27] +=
 			(uint32_t) in_phyaddr;
