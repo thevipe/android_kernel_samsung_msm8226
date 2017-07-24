@@ -134,7 +134,6 @@
 				sec,poweroff-check-soc = <1>;
 				sec,update-time = <60>;
 				sec,sleep-update-time = <300>;
-			};
 
 			qcom,chgr@1000 {
 				status = "disabled";
