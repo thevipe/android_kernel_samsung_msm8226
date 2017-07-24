@@ -1445,7 +1445,6 @@ static int msm_cpp_cfg(struct cpp_device *cpp_dev,
 			(uint32_t) out_phyaddr0;
 		cpp_frame_msg[(142 + fw_version_1_2_x) + i * 27] +=
 			(uint32_t) out_phyaddr1;
-			(uint32_t)in_phyaddr;
 		cpp_frame_msg[(139 + fw_version_1_2_x) + i * 27] +=
 			(uint32_t)out_phyaddr0;
 		cpp_frame_msg[(140 + fw_version_1_2_x) + i * 27] +=
