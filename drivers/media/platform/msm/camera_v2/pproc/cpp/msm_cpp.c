@@ -1410,33 +1410,10 @@ static int msm_cpp_cfg(struct cpp_device *cpp_dev,
 		(cpp_frame_msg[12] & 0x3FF);
 
 	fw_version_1_2_x = 0;
-	if (cpp_dev->hw_info.cpp_hw_version == 0x10010000 ||
-            cpp_dev->hw_info.cpp_hw_version == 0x20000000) {
-		      ((cpp_frame_msg[12] >> 10) & 0x3FF) +
-		      (cpp_frame_msg[12] & 0x3FF);
-
-	fw_version_1_2_x = 0;
 	if ((cpp_dev->hw_info.cpp_hw_version == CPP_HW_VERSION_1_1_0) ||
-	    (cpp_dev->hw_info.cpp_hw_version == CPP_HW_VERSION_1_1_1)) {
+		(cpp_dev->hw_info.cpp_hw_version == CPP_HW_VERSION_1_1_1) ||
+		(cpp_dev->hw_info.cpp_hw_version == CPP_HW_VERSION_2_0_0))
 		fw_version_1_2_x = 2;
-	if ((cpp_dev->fw_version & 0xffff0000) ==
-		CPP_FW_VERSION_1_2_0) {
-		stripe_base = STRIPE_BASE_FW_1_2_0;
-	} else if ((cpp_dev->fw_version & 0xffff0000) ==
-		CPP_FW_VERSION_1_4_0) {
-		stripe_base = STRIPE_BASE_FW_1_4_0;
-	} else if ((cpp_dev->fw_version & 0xffff0000) ==
-		CPP_FW_VERSION_1_6_0) {
-		stripe_base = STRIPE_BASE_FW_1_6_0;
-	} else {
-		pr_err("invalid fw version %08x", cpp_dev->fw_version);
-	}
-
-	if ((stripe_base + num_stripes*27 + 1) != new_frame->msg_len) {
-		pr_err("Invalid frame message\n");
-		rc = -EINVAL;
-		goto ERROR3;
-	}
 
 	for (i = 0; i < num_stripes; i++) {
 		cpp_frame_msg[(133 + fw_version_1_2_x) + i * 27] +=
@@ -1449,35 +1426,8 @@ static int msm_cpp_cfg(struct cpp_device *cpp_dev,
 			(uint32_t) out_phyaddr0;
 		cpp_frame_msg[(142 + fw_version_1_2_x) + i * 27] +=
 			(uint32_t) out_phyaddr1;
-			(uint32_t)in_phyaddr;
-		cpp_frame_msg[(139 + fw_version_1_2_x) + i * 27] +=
-			(uint32_t)out_phyaddr0;
-		cpp_frame_msg[(140 + fw_version_1_2_x) + i * 27] +=
-			(uint32_t)out_phyaddr1;
-		cpp_frame_msg[(141 + fw_version_1_2_x) + i * 27] +=
-			(uint32_t)out_phyaddr0;
-		cpp_frame_msg[(142 + fw_version_1_2_x) + i * 27] +=
-			(uint32_t)out_phyaddr1;
-	}
-	
-	if ((stripe_base + num_stripes*27 + 1) != new_frame->msg_len) {
-		pr_err("Invalid frame message\n");
-		rc = -EINVAL;
-		goto ERROR3;
 	}
 
-	for (i = 0; i < num_stripes; i++) {
-		cpp_frame_msg[stripe_base + 5 + i*27] +=
-			(uint32_t) in_phyaddr;
-		cpp_frame_msg[stripe_base + 11 + i * 27] +=
-			(uint32_t) out_phyaddr0;
-		cpp_frame_msg[stripe_base + 12 + i * 27] +=
-			(uint32_t) out_phyaddr1;
-		cpp_frame_msg[stripe_base + 13 + i * 27] +=
-			(uint32_t) out_phyaddr0;
-		cpp_frame_msg[stripe_base + 14 + i * 27] +=
-			(uint32_t) out_phyaddr1;
-	}
 
 	frame_qcmd = kzalloc(sizeof(struct msm_queue_cmd), GFP_KERNEL);
 	if (!frame_qcmd) {
