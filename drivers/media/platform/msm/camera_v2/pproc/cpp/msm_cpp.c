@@ -1296,7 +1296,6 @@ static int msm_cpp_cfg(struct cpp_device *cpp_dev,
 	int32_t *ret_status = 0;
 	int32_t stripe_base = 0;
 	uint8_t fw_version_1_2_x = 0;
-	int in_fd;
 	int i = 0;
 	if (!new_frame) {
 		pr_err("Insufficient memory. return\n");
