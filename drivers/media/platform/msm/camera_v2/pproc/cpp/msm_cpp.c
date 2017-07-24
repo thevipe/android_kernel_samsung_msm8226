@@ -1412,15 +1412,12 @@ static int msm_cpp_cfg(struct cpp_device *cpp_dev,
 
 	fw_version_1_2_x = 0;
 	if (cpp_dev->hw_info.cpp_hw_version == 0x10010000 ||
-            cpp_dev->hw_info.cpp_hw_version == 0x20000000) { 
-			((cpp_frame_msg[12] >> 10) & 0x3FF) +
-		      (cpp_frame_msg[12] & 0x3FF);
-			  fw_version_1_2_x = 2;
-	}
-
+            cpp_dev->hw_info.cpp_hw_version == 0x20000000){
+		fw_version_1_2_x = 2;
+		
 	fw_version_1_2_x = 0;
 	if ((cpp_dev->hw_info.cpp_hw_version == CPP_HW_VERSION_1_1_0) ||
-	    (cpp_dev->hw_info.cpp_hw_version == CPP_HW_VERSION_1_1_1)) {
+	    (cpp_dev->hw_info.cpp_hw_version == CPP_HW_VERSION_1_1_1))
 		fw_version_1_2_x = 2;
 	if ((cpp_dev->fw_version & 0xffff0000) ==
 		CPP_FW_VERSION_1_2_0) {
