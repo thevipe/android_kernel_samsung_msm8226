@@ -95,7 +95,7 @@
 		but-zones-list = <&but_zones 0 0 170>,
                          <&but_zones 1 171 340>,
                          <&but_zones 2 341 775>;
-		mpp-channel-scaling = <6 1 3>;
+		mpp-channel-scaling = <6 1 1>;
         };
 };
 

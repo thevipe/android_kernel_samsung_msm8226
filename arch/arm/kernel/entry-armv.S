@@ -691,8 +691,6 @@ ENTRY(fp_enter)
 	.popsection
 
 ENTRY(no_fp)
-	mov	pc, lr
-ENDPROC(no_fp)
 
 __und_usr_fault_32:
 	mov	r1, #4
@@ -705,6 +703,7 @@ __und_usr_fault_16:
 	b	__und_fault
 ENDPROC(__und_usr_fault_32)
 ENDPROC(__und_usr_fault_16)
+
 
 	.align	5
 __pabt_usr:

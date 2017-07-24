@@ -127,6 +127,7 @@ struct max77803_platform_data {
 
 enum cable_type_muic;
 struct max77803_muic_data {
+#if !defined(CONFIG_EXTCON)
 	void (*usb_cb) (u8 attached);
 	void (*uart_cb) (u8 attached);
 	int (*charger_cb) (enum cable_type_muic);
@@ -143,7 +144,10 @@ struct max77803_muic_data {
 	int uart_path;
 
 	void (*jig_state) (int jig_state);
-
+#else
+	int usb_sel;
+	int uart_sel;
+#endif
 };
 
 #ifdef CONFIG_MFD_MAX77803

@@ -1889,13 +1889,9 @@ static int es705_wakeup(struct es705_priv *es705)
 
 	if (delayed_work_pending(&es705->sleep_work) ||
 		(es705->pm_state == ES705_POWER_SLEEP_PENDING)) {
-		mutex_unlock(&es705->pm_mutex);
 		cancel_delayed_work_sync(&es705->sleep_work);
-		mutex_lock(&es705->pm_mutex);
-		if (es705->pm_state == ES705_POWER_SLEEP_PENDING) {
-			es705->pm_state = ES705_POWER_AWAKE;
-			goto es705_wakeup_exit;
-		}
+		es705->pm_state = ES705_POWER_AWAKE;
+		goto es705_wakeup_exit;
 	}
 
 	/* Check if previous power state is not sleep then return */

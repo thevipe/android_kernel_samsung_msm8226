@@ -19,13 +19,17 @@
 /include/ "msm8974pro-isdb-chagalljpn-r00.dtsi"
 
 / {
-	model = "Samsung Chagall MSM8974Pro rev0.0";
+	model = "Samsung Chagall JPN MSM8974Pro rev0.0";
 	compatible = "qcom,msm8974-mtp", "qcom,msm8974", "qcom,mtp";
 	/*QCOM BOARD REV TYPE...*/
 	/*qcom,msm-id = <194 8 0x10000>;*/
 	/*SEC BOARD REV TYPE...*/
         qcom,msm-id = <0xC2085101 0 0x10000>;
         /* [31:24] chip-id, [23:16] platform-id, [15:8] national code, [7:0] operator revision, reserved */
+};
+
+&secure_mem {
+	reg = <0 0xFC00000>;
 };
 
 &pma8084_vadc {
@@ -83,6 +87,17 @@
 		qcom,hw-settle-time = <2>;
 		qcom,fast-avg-setup = <0>;
 	};
+
+        chan@14 {
+                label = "mpp5_div1";
+                reg = <0x14>;
+                qcom,decimation = <0>;
+                qcom,pre-div-channel-scaling = <0>;
+                qcom,calibration-type = "absolute";
+                qcom,scale-function = <0>;
+                qcom,hw-settle-time = <0>;
+                qcom,fast-avg-setup = <0>;
+        };
 };
 
 &pma8084_adc_tm {

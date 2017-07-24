@@ -399,7 +399,7 @@ This is causing conflict to IRLED driver in Millet Wifi US Open and thus disabli
 			qcom,cdc-reset-gpio = <&msmgpio 72 0>;
 
 			cdc-vdd-buck-supply = <&pm8226_s4>;
-			qcom,cdc-vdd-buck-voltage = <2150000 2150000>;
+			qcom,cdc-vdd-buck-voltage = <1800000 1800000>;
 			qcom,cdc-vdd-buck-current = <650000>;
 
 			cdc-vdd-h-supply = <&pm8226_l6>;

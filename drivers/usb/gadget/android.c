@@ -2305,8 +2305,7 @@ static ssize_t audio_source_pcm_show(struct device *dev,
 	struct audio_source_config *config = f->config;
 
 	/* print PCM card and device numbers */
-	return snprintf(buf, PAGE_SIZE,
-			"%d %d\n", config->card, config->device);
+	return sprintf(buf, "%d %d\n", config->card, config->device);
 }
 
 static DEVICE_ATTR(pcm, S_IRUGO | S_IWUSR, audio_source_pcm_show, NULL);
@@ -2989,7 +2988,6 @@ bcdUSB_show(struct device *pdev, struct device_attribute *attr, char *buf)
 	}
 }
 
-#ifdef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
 #if defined(CONFIG_SEC_H_PROJECT) || defined(CONFIG_SEC_F_PROJECT) || defined(CONFIG_SEC_K_PROJECT)
 static ssize_t
 usb30en_show(struct device *pdev, struct device_attribute *attr, char *buf)
@@ -3082,7 +3080,6 @@ static ssize_t macos_show(struct device *pdev,
 	return sprintf(buf, "%d\n", value);
 }
 #endif
-#endif
 
 #ifdef CONFIG_USB_LOCK_SUPPORT_FOR_MDM
 static ssize_t show_usb_device_lock_state(struct device *pdev,
@@ -3136,12 +3133,10 @@ static ssize_t store_usb_device_lock_state(struct device *pdev,
 
 
 static DEVICE_ATTR(bcdUSB, S_IRUGO | S_IWUSR, bcdUSB_show, NULL);
-#ifdef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
 #if defined(CONFIG_SEC_H_PROJECT) || defined(CONFIG_SEC_F_PROJECT) || defined(CONFIG_SEC_K_PROJECT)
 static DEVICE_ATTR(usb30en,S_IRUGO | S_IWUSR, usb30en_show, usb30en_store);
 static DEVICE_ATTR(ss_host_available,S_IRUGO | S_IWUSR, ss_host_available_show, NULL);
 static DEVICE_ATTR(macos,S_IRUGO | S_IWUSR, macos_show, NULL);
-#endif
 #endif
 static DEVICE_ATTR(functions, S_IRUGO | S_IWUSR, functions_show,
 						 functions_store);
@@ -3172,12 +3167,10 @@ static struct device_attribute *android_usb_attributes[] = {
 	&dev_attr_pm_qos,
 	&dev_attr_state,
 	&dev_attr_bcdUSB,
-#ifdef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
 #if defined(CONFIG_SEC_H_PROJECT) || defined(CONFIG_SEC_F_PROJECT) || defined(CONFIG_SEC_K_PROJECT)
 	&dev_attr_usb30en,
 	&dev_attr_ss_host_available,
 	&dev_attr_macos,
-#endif
 #endif
 	&dev_attr_remote_wakeup,
 #ifdef CONFIG_USB_LOCK_SUPPORT_FOR_MDM

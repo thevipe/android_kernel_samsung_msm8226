@@ -35,7 +35,6 @@
 #include <linux/eventfd.h>
 #include <linux/blkdev.h>
 #include <linux/compat.h>
-#include <linux/personality.h>
 
 #include <asm/kmap_types.h>
 #include <asm/uaccess.h>
@@ -111,9 +110,6 @@ static int aio_setup_ring(struct kioctx *ctx)
 	unsigned nr_events = ctx->max_reqs;
 	unsigned long size;
 	int nr_pages;
-
-	if (current->personality & READ_IMPLIES_EXEC)
-		return -EPERM;
 
 	/* Compensate for the ring buffer's head/tail overlap entry */
 	nr_events += 2;	/* 1 is required, 2 for good luck */
@@ -1098,9 +1094,9 @@ static int aio_read_evt(struct kioctx *ioctx, struct io_event *ent)
 	spin_unlock(&info->ring_lock);
 
 out:
+	kunmap_atomic(ring);
 	dprintk("leaving aio_read_evt: %d  h%lu t%lu\n", ret,
 		 (unsigned long)ring->head, (unsigned long)ring->tail);
-	kunmap_atomic(ring);
 	return ret;
 }
 

@@ -11,7 +11,7 @@
  */
 
 /include/ "msm8974pro-sii8240_mhl-k-r02.dtsi"
-/include/ "msm8974pro-fingerprint-sensor-k-r08.dtsi"
+/include/ "msm8974pro-fingerprint-sensor-chagalljpn-r00.dtsi"
 /include/ "msm8974pro-camera-sensor-chagalljpn-r00.dtsi"
 
 / {
@@ -33,7 +33,7 @@
 
 	samsung,vibrator {
 		compatible = "vibrator";
-		samsung,pmic_vib_pwm = <&msmgpio 27 0>;
+		samsung,pmic_vib_pwm = <&msmgpio 94 0>;
 		samsung,vib_model = <1>;
 		samsung,pmic_vib_en = <0>;
 		samsung,pmic_haptic_pwr_en = <0>;
@@ -72,6 +72,7 @@
 		status = "okay";
 		qcom,scl-gpio = <&msmgpio 7 0>;
 		qcom,sda-gpio = <&msmgpio 6 0>;
+		qcom,noise-rjct-scl= <1>;
 		synaptics@20 {
 			compatible = "synaptics,rmi4-ts";
 			reg = <0x20>;
@@ -162,7 +163,7 @@
 			status = "okay";
 			reg = <0x0c>;
 			ak09911c-i2c,m_rst_n-gpio = <&msmgpio 122 0x01>;
-			ak09911c-i2c,chip_pos = <4>;
+			ak09911c-i2c,chip_pos = <5>;
 			ak09911c-i2c-vcc-supply = <&pma8084_l18>;
                         ak09911c-i2c-lvs1-supply = <&pma8084_lvs1>;
 
@@ -296,6 +297,7 @@
 		/* BLSP #9 */
 	i2c@f9965000 
 	{	
+		status = "ok";
 		pn547@2B
 		{
 			compatible = "pn547";
@@ -457,15 +459,15 @@
 		   SEC_BATTERY_FULL_CONDITION_NOTIMEFULL |
 		   SEC_BATTERY_FULL_CONDITION_VCELL */
 		battery,full_condition_type = <13>;
-		battery,full_condition_soc = <97>;
-		battery,full_condition_vcell = <4350>;
+		battery,full_condition_soc = <93>;
+		battery,full_condition_vcell = <4250>;
 
 		battery,recharge_check_count = <1>;
 		battery,recharge_condition_type = <4>; /* SEC_BATTERY_RECHARGE_CONDITION_VCELL */
 		battery,recharge_condition_soc = <98>;
-		battery,recharge_condition_vcell = <4350>;
+		battery,recharge_condition_vcell = <4300>;
 
-		battery,charging_total_time = <21600>;
+		battery,charging_total_time = <36000>;
 		battery,recharging_total_time = <5400>;
 		battery,charging_reset_time = <0>;
 
@@ -484,7 +486,7 @@
 			battery,chg_polarity_en = <0>;
 			battery,chg_gpio_status = <0>;
 			battery,chg_polarity_status = <0>;
-			battery,chg_float_voltage = <4400>;
+			battery,chg_float_voltage = <4350>;
 			battery,chg_high_temp = <520>;
 			battery,chg_high_temp_recovery = <420>;
 			battery,ovp_uvlo_check_type = <3>; /* SEC_BATTERY_OVP_UVLO_CHGPOLLING */
@@ -493,7 +495,7 @@
 
 			battery,input_current_limit = <1800 460 460 1800 460 900 1000 460 460 1000 650 1800 1800 460 1300 400 700 1300 300 1000 1800 460 1800 1800 460>;
 			battery,fast_charging_current = <1800 0 460 2300 460 1200 1000 460 0 1200 750 2100 2100 0 1300 400 700 1300 300 1000 2100 0 2800 2800 0>;
-			battery,full_check_current_1st = <200 0 200 200 200 200 200 200 200 0 200 200 200 200 0 200 200 200 200 200 200 200 200 200 0>;
+			battery,full_check_current_1st = <250 0 250 250 250 250 250 250 250 0 250 250 250 250 0 250 250 250 250 250 250 250 200 250 0>;
 			battery,full_check_current_2nd = <2400 0 2400 2400 2400 2400 2400 2400 0 2400 2400 2400 2400 0 2400 2400 2400 2400 2400 2400 2400 0 2400 2400 0>;
 		};
 	};
@@ -567,7 +569,7 @@
 
 	qcom,pad-pull-on = <0x0 0x3 0x3>; /* no-pull, pull-up, pull-up */
 	qcom,pad-pull-off = <0x0 0x3 0x3>; /* no-pull, pull-up, pull-up */
-	qcom,pad-drv-on = <0x7 0x4 0x4>; /* 16mA, 10mA, 10mA */
+	qcom,pad-drv-on = <0x3 0x3 0x2>; /* 8mA, 8mA, 6mA */
 	qcom,pad-drv-off = <0x0 0x0 0x0>; /* 2mA, 2mA, 2mA */
 
 	qcom,current-limit = <32000>;
@@ -603,7 +605,7 @@
 	qcom,sup-voltages = <2950 2950>;
 
 
-	qcom,clk-rates = <400000 20000000 25000000 50000000 100000000>;
+	qcom,clk-rates = <400000 20000000 25000000 50000000>;
 
 	status = "ok";
 };
@@ -690,8 +692,8 @@
  		qcom,invert = <0>;		/* Do not invert the output */
  		qcom,vin-sel = <2>;		/* PMA8084 S4 = 1.8 V */
  		qcom,src-sel = <0>;		/* GPIO */
-		qcom,pull = <4>;		/* Pull Down. */
- 		qcom,out-strength = <3>;	/* High drive strength */
+		qcom,pull = <5>;                /* QPNP_PIN_PULL_NO */
+ 		qcom,out-strength = <2>;	/* Medium drive strength */
  		qcom,master-en = <1>;		/* Enable GPIO */
 	};
 
@@ -727,7 +729,8 @@
 	};
 
 	gpio@c700 { /* GPIO 8 */
-		/* Touchscreen IRQ */
+		/* CAM VT STBY */
+		qcom,vin-sel = <2>;
 		qcom,mode = <0>;		/* Digital input */
 		qcom,pull = <5>;		/* Pull none */
 		qcom,master-en = <1>;
@@ -875,13 +878,12 @@
 		qcom,src-sel = <0>; /* Function constant */
 	};
 
-	mpp@a400 { /* MPP 5 */
-		/* POGO_DET */
-		qcom,mode = <0>;		/* Digital output */
-		qcom,vin-sel = <2>;		/* PMA8084 S4 = 1.8V > 1.6V */
-		qcom,src-sel = <0>;		/* Constant */
-		qcom,master-en = <1>;
-	};
+        mpp@a400 { /* MPP 5 */
+                qcom,mode = <4>; /* AIN input */
+                qcom,ain-route = <0>; /* AMUX 5 */
+                qcom,master-en = <1>;/* Enable MPP5 */
+                qcom,src-sel = <0>; /* Function constant */
+        };
 
 	mpp@a500 { /* MPP 6 */
 		/* SPI ethernet enable */

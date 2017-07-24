@@ -103,15 +103,6 @@ struct fuse_inode {
 
 	/** List of writepage requestst (pending or sent) */
 	struct list_head writepages;
-
-	/** Miscellaneous bits describing inode state */
-	unsigned long state;
-};
-
-/** FUSE inode state bits */
-enum {
-	/** An operation changing file size is in progress  */
-	FUSE_I_SIZE_UNSTABLE,
 };
 
 struct fuse_conn;
@@ -313,9 +304,6 @@ struct fuse_req {
 
 	/** Inode used in the request or NULL */
 	struct inode *inode;
-
-	/** Path used for completing d_canonical_path */
-	struct path *canonical_path;
 
 	/** Link on fi->writepages */
 	struct list_head writepages_entry;

@@ -471,6 +471,7 @@ void pub_crypto_control_init(pub_crypto_control_t *con) {
 }
 
 static int __init pub_crypto_mod_init(void) {
+
 	crypto_sock = netlink_kernel_create(&init_net, NETLINK_FIPS_CRYPTO, 0, crypto_recver, NULL, THIS_MODULE);
 
 	if (!crypto_sock) {

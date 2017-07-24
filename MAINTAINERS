@@ -2627,7 +2627,7 @@ S:	Maintained
 F:	drivers/net/ethernet/i825xx/eexpress.*
 
 ETHERNET BRIDGE
-M:	Stephen Hemminger <stephen@networkplumber.org>
+M:	Stephen Hemminger <shemminger@vyatta.com>
 L:	bridge@lists.linux-foundation.org
 L:	netdev@vger.kernel.org
 W:	http://www.linuxfoundation.org/en/Net:Bridge
@@ -2889,6 +2889,17 @@ S:	Supported
 F:	Documentation/filesystems/caching/
 F:	fs/fscache/
 F:	include/linux/fscache*.h
+
+F2FS FILE SYSTEM
+M:	Jaegeuk Kim <jaegeuk.kim@samsung.com>
+L:	linux-f2fs-devel@lists.sourceforge.net
+W:	http://en.wikipedia.org/wiki/F2FS
+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs.git
+S:	Maintained
+F:	Documentation/filesystems/f2fs.txt
+F:	Documentation/ABI/testing/sysfs-fs-f2fs
+F:	fs/f2fs/
+F:	include/linux/f2fs_fs.h
 
 FUJITSU FR-V (FRV) PORT
 M:	David Howells <dhowells@redhat.com>
@@ -4319,7 +4330,7 @@ S:	Maintained
 
 MARVELL GIGABIT ETHERNET DRIVERS (skge/sky2)
 M:	Mirko Lindner <mlindner@marvell.com>
-M:	Stephen Hemminger <stephen@networkplumber.org>
+M:	Stephen Hemminger <shemminger@vyatta.com>
 L:	netdev@vger.kernel.org
 S:	Maintained
 F:	drivers/net/ethernet/marvell/sk*
@@ -4570,7 +4581,7 @@ S:	Supported
 F:	drivers/infiniband/hw/nes/
 
 NETEM NETWORK EMULATOR
-M:	Stephen Hemminger <stephen@networkplumber.org>
+M:	Stephen Hemminger <shemminger@vyatta.com>
 L:	netem@lists.linux-foundation.org
 S:	Maintained
 F:	net/sched/sch_netem.c
@@ -5944,16 +5955,6 @@ S:	Maintained
 F:	drivers/mmc/host/sdhci.*
 F:	drivers/mmc/host/sdhci-pltfm.[ch]
 
-SECURE COMPUTING
-M:	Kees Cook <keescook@chromium.org>
-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git seccomp
-S:	Supported
-F:	kernel/seccomp.c
-F:	include/uapi/linux/seccomp.h
-F:	include/linux/seccomp.h
-K:	\bsecure_computing
-K:	\bTIF_SECCOMP\b
-
 SECURE DIGITAL HOST CONTROLLER INTERFACE, OPEN FIRMWARE BINDINGS (SDHCI-OF)
 M:	Anton Vorontsov <avorontsov@ru.mvista.com>
 L:	linuxppc-dev@lists.ozlabs.org
@@ -6407,7 +6408,6 @@ STABLE BRANCH
 M:	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 L:	stable@vger.kernel.org
 S:	Supported
-F:	Documentation/stable_kernel_rules.txt
 
 STAGING SUBSYSTEM
 M:	Greg Kroah-Hartman <gregkh@linuxfoundation.org>

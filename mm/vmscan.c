@@ -19,7 +19,6 @@
 #include <linux/pagemap.h>
 #include <linux/init.h>
 #include <linux/highmem.h>
-#include <linux/vmpressure.h>
 #include <linux/vmstat.h>
 #include <linux/file.h>
 #include <linux/writeback.h>
@@ -196,9 +195,11 @@ unsigned long zone_reclaimable_pages(struct zone *zone)
 	nr = zone_page_state(zone, NR_ACTIVE_FILE) +
 	     zone_page_state(zone, NR_INACTIVE_FILE);
 
+#ifndef CONFIG_RUNTIME_COMPCACHE
 	if (get_nr_swap_pages() > 0)
 		nr += zone_page_state(zone, NR_ACTIVE_ANON) +
 		      zone_page_state(zone, NR_INACTIVE_ANON);
+#endif /* CONFIG_RUNTIME_COMPCACHE */
 
 	return nr;
 }
@@ -973,7 +974,7 @@ cull_mlocked:
 
 activate_locked:
 		/* Not a candidate for swapping, so reclaim swap space. */
-		if (PageSwapCache(page) && vm_swap_full(page_swap_info(page)))
+		if (PageSwapCache(page) && vm_swap_full())
 			try_to_free_swap(page);
 		VM_BUG_ON(PageActive(page));
 		SetPageActive(page);
@@ -1250,14 +1251,6 @@ static int __too_many_isolated(struct zone *zone, int file,
 		}
 	}
 
-	/*
-	 * GFP_NOIO/GFP_NOFS callers are allowed to isolate more pages, so they
-	 * won't get blocked by normal direct-reclaimers, forming a circular
-	 * deadlock.
-	 */
-	if ((sc->gfp_mask & GFP_IOFS) == GFP_IOFS)
-		inactive >>= 3;
-
 	return isolated > inactive;
 }
 
@@ -1267,7 +1260,6 @@ static int __too_many_isolated(struct zone *zone, int file,
 static int too_many_isolated(struct zone *zone, int file,
 		struct scan_control *sc, int safe)
 {
-
 #ifdef CONFIG_RUNTIME_COMPCACHE
 	if (get_rtcc_status() == 1)
 		return 0;
@@ -1303,7 +1295,6 @@ putback_inactive_pages(struct mem_cgroup_zone *mz,
 	while (!list_empty(page_list)) {
 		struct page *page = lru_to_page(page_list);
 		int lru;
-		int file;
 
 		VM_BUG_ON(PageLRU(page));
 		list_del(&page->lru);
@@ -1316,12 +1307,8 @@ putback_inactive_pages(struct mem_cgroup_zone *mz,
 		SetPageLRU(page);
 		lru = page_lru(page);
 		add_page_to_lru_list(zone, page, lru);
-
-		file = is_file_lru(lru);
-		if (IS_ENABLED(CONFIG_ZCACHE))
-			if (file)
-				SetPageWasActive(page);
 		if (is_active_lru(lru)) {
+			int file = is_file_lru(lru);
 			int numpages = hpage_nr_pages(page);
 			reclaim_stat->recent_rotated[file] += numpages;
 		}
@@ -1617,12 +1604,6 @@ static void shrink_active_list(unsigned long nr_to_scan,
 		}
 
 		ClearPageActive(page);	/* we are de-activating */
-		if (IS_ENABLED(CONFIG_ZCACHE))
-			/*
-			 * For zcache to know whether the page is from active
-			 * file list
-			 */
-			SetPageWasActive(page);
 		list_add(&page->lru, &l_inactive);
 	}
 
@@ -2036,16 +2017,12 @@ restart:
 
 static void shrink_zone(struct zone *zone, struct scan_control *sc)
 {
-	unsigned long nr_reclaimed, nr_scanned;
 	struct mem_cgroup *root = sc->target_mem_cgroup;
 	struct mem_cgroup_reclaim_cookie reclaim = {
 		.zone = zone,
 		.priority = sc->priority,
 	};
 	struct mem_cgroup *memcg;
-
-	nr_reclaimed = sc->nr_reclaimed;
-	nr_scanned = sc->nr_scanned;
 
 	memcg = mem_cgroup_iter(root, NULL, &reclaim);
 	do {
@@ -2071,10 +2048,6 @@ static void shrink_zone(struct zone *zone, struct scan_control *sc)
 		}
 		memcg = mem_cgroup_iter(root, memcg, &reclaim);
 	} while (memcg);
-
-	vmpressure(sc->gfp_mask, sc->target_mem_cgroup,
-		   sc->nr_scanned - nr_scanned,
-		   sc->nr_reclaimed - nr_reclaimed);
 }
 
 /* Returns true if compaction should go ahead for a high-order request */
@@ -2387,7 +2360,6 @@ static unsigned long do_try_to_free_pages(struct zonelist *zonelist,
 		count_vm_event(ALLOCSTALL);
 
 	do {
-		vmpressure_prio(sc->gfp_mask, sc->target_mem_cgroup, sc->priority);
 		sc->nr_scanned = 0;
 		aborted_reclaim = shrink_zones(zonelist, sc);
 
@@ -2415,13 +2387,6 @@ static unsigned long do_try_to_free_pages(struct zonelist *zonelist,
 		total_scanned += sc->nr_scanned;
 		if (sc->nr_reclaimed >= sc->nr_to_reclaim)
 			goto out;
-
-		/*
-		 * If we're getting trouble reclaiming, start doing
-		 * writepage even in laptop mode.
-		 */
-		if (sc->priority < DEF_PRIORITY - 2)
-			sc->may_writepage = 1;
 
 		/*
 		 * Try to write back as many pages as we just scanned.  This
@@ -2904,10 +2869,12 @@ loop_again:
 			}
 
 			/*
-			 * If we're getting trouble reclaiming, start doing
-			 * writepage even in laptop mode.
+			 * If we've done a decent amount of scanning and
+			 * the reclaim ratio is low, start doing writepage
+			 * even in laptop mode
 			 */
-			if (sc.priority < DEF_PRIORITY - 2)
+			if (total_scanned > SWAP_CLUSTER_MAX * 2 &&
+			    total_scanned > sc.nr_reclaimed + sc.nr_reclaimed / 2)
 				sc.may_writepage = 1;
 
 			if (!zone_reclaimable(zone)) {
@@ -3199,10 +3166,7 @@ static int kswapd(void *p)
 		}
 	}
 
-	tsk->flags &= ~(PF_MEMALLOC | PF_SWAPWRITE | PF_KSWAPD);
 	current->reclaim_state = NULL;
-	lockdep_clear_current_reclaim_state();
-
 	return 0;
 }
 
@@ -3230,27 +3194,6 @@ void wakeup_kswapd(struct zone *zone, int order, enum zone_type classzone_idx)
 
 	trace_mm_vmscan_wakeup_kswapd(pgdat->node_id, zone_idx(zone), order);
 	wake_up_interruptible(&pgdat->kswapd_wait);
-}
-
-/*
- * The reclaimable count would be mostly accurate.
- * The less reclaimable pages may be
- * - mlocked pages, which will be moved to unevictable list when encountered
- * - mapped pages, which may require several travels to be reclaimed
- * - dirty pages, which is not "instantly" reclaimable
- */
-unsigned long global_reclaimable_pages(void)
-{
-	int nr;
-
-	nr = global_page_state(NR_ACTIVE_FILE) +
-	     global_page_state(NR_INACTIVE_FILE);
-
-	if (get_nr_swap_pages() > 0)
-		nr += global_page_state(NR_ACTIVE_ANON) +
-		      global_page_state(NR_INACTIVE_ANON);
-
-	return nr;
 }
 
 #ifdef CONFIG_HIBERNATION

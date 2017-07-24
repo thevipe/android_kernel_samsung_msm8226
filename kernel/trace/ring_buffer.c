@@ -1300,14 +1300,13 @@ int ring_buffer_resize(struct ring_buffer *buffer, unsigned long size)
 	if (!buffer)
 		return size;
 
-	nr_pages = DIV_ROUND_UP(size, BUF_PAGE_SIZE);
+	size = DIV_ROUND_UP(size, BUF_PAGE_SIZE);
+	size *= BUF_PAGE_SIZE;
 	buffer_size = buffer->pages * BUF_PAGE_SIZE;
 
 	/* we need a minimum of two pages */
-	if (nr_pages < 2)
-		nr_pages = 2;
-
-	size = nr_pages * BUF_PAGE_SIZE;
+	if (size < BUF_PAGE_SIZE * 2)
+		size = BUF_PAGE_SIZE * 2;
 
 	if (size == buffer_size)
 		return size;
@@ -1319,6 +1318,8 @@ int ring_buffer_resize(struct ring_buffer *buffer, unsigned long size)
 
 	mutex_lock(&buffer->mutex);
 	get_online_cpus();
+
+	nr_pages = DIV_ROUND_UP(size, BUF_PAGE_SIZE);
 
 	if (size < buffer_size) {
 
@@ -2006,13 +2007,6 @@ __rb_reserve_next(struct ring_buffer_per_cpu *cpu_buffer,
 	/* set write to only the index of the write */
 	write &= RB_WRITE_MASK;
 	tail = write - length;
-
-	/*
-	 * If this is the first commit on the page, then it has the same
-	 * timestamp as the page itself.
-	 */
-	if (!tail)
-		delta = 0;
 
 	/* See if we shot pass the end of this buffer page */
 	if (unlikely(write > BUF_PAGE_SIZE))

@@ -68,13 +68,9 @@
 #include <linux/shmem_fs.h>
 #include <linux/slab.h>
 #include <linux/perf_event.h>
-#include <linux/random.h>
-#include <linux/sched_clock.h>
-
 #ifdef CONFIG_TIMA_RKP_COHERENT_TT
 #include <linux/memblock.h>
 #endif
-
 #include <asm/io.h>
 #include <asm/bugs.h>
 #include <asm/setup.h>
@@ -710,7 +706,6 @@ asmlinkage void __init start_kernel(void)
 	softirq_init();
 	timekeeping_init();
 	time_init();
-	sched_clock_postinit();
 	profile_init();
 	call_function_init();
 	if (!irqs_disabled())
@@ -761,12 +756,8 @@ asmlinkage void __init start_kernel(void)
 	pidmap_init();
 	anon_vma_init();
 #ifdef CONFIG_X86
-	if (efi_enabled(EFI_RUNTIME_SERVICES))
+	if (efi_enabled)
 		efi_enter_virtual_mode();
-#endif
-#ifdef CONFIG_X86_ESPFIX64
-	/* Should be run before the first non-init thread is created */
-	init_espfix_bsp();
 #endif
 	thread_info_cache_init();
 	cred_init();
@@ -793,7 +784,7 @@ asmlinkage void __init start_kernel(void)
 	acpi_early_init(); /* before LAPIC and SMP init */
 	sfi_init_late();
 
-	if (efi_enabled(EFI_RUNTIME_SERVICES))
+	if (efi_enabled)
 		efi_free_boot_services();
 
 	ftrace_init();
@@ -942,7 +933,6 @@ static void __init do_basic_setup(void)
 	do_ctors();
 	usermodehelper_enable();
 	do_initcalls();
-	random_int_secret_init();
 }
 
 static void __init do_pre_smp_initcalls(void)

@@ -153,27 +153,6 @@ static void bictcp_init(struct sock *sk)
 		tcp_sk(sk)->snd_ssthresh = initial_ssthresh;
 }
 
-static void bictcp_cwnd_event(struct sock *sk, enum tcp_ca_event event)
-{
-	if (event == CA_EVENT_TX_START) {
-		struct bictcp *ca = inet_csk_ca(sk);
-		u32 now = tcp_time_stamp;
-		s32 delta;
-
-		delta = now - tcp_sk(sk)->lsndtime;
-
-		/* We were application limited (idle) for a while.
-		 * Shift epoch_start to keep cwnd growth to cubic curve.
-		 */
-		if (ca->epoch_start && delta > 0) {
-			ca->epoch_start += delta;
-			if (after(ca->epoch_start, now))
-				ca->epoch_start = now;
-		}
-		return;
-	}
-}
-
 /* calculate the cubic root of x using a table lookup followed by one
  * Newton-Raphson iteration.
  * Avg err ~= 0.195%
@@ -227,8 +206,8 @@ static u32 cubic_root(u64 a)
  */
 static inline void bictcp_update(struct bictcp *ca, u32 cwnd)
 {
-	u32 delta, bic_target, max_cnt;
-	u64 offs, t;
+	u64 offs;
+	u32 delta, t, bic_target, max_cnt;
 
 	ca->ack_cnt++;	/* count the number of ACKs */
 
@@ -271,11 +250,9 @@ static inline void bictcp_update(struct bictcp *ca, u32 cwnd)
 	 * if the cwnd < 1 million packets !!!
 	 */
 
-	t = (s32)(tcp_time_stamp - ca->epoch_start);
-	t += msecs_to_jiffies(ca->delay_min >> 3);
 	/* change the unit from HZ to bictcp_HZ */
-	t <<= BICTCP_HZ;
-	do_div(t, HZ);
+	t = ((tcp_time_stamp + msecs_to_jiffies(ca->delay_min>>3)
+	      - ca->epoch_start) << BICTCP_HZ) / HZ;
 
 	if (t < ca->bic_K)		/* t - K */
 		offs = ca->bic_K - t;
@@ -429,7 +406,7 @@ static void bictcp_acked(struct sock *sk, u32 cnt, s32 rtt_us)
 		ratio -= ca->delayed_ack >> ACK_RATIO_SHIFT;
 		ratio += cnt;
 
-		ca->delayed_ack = clamp(ratio, 1U, ACK_RATIO_LIMIT);
+		ca->delayed_ack = min(ratio, ACK_RATIO_LIMIT);
 	}
 
 	/* Some calls are for duplicates without timetamps */
@@ -437,7 +414,7 @@ static void bictcp_acked(struct sock *sk, u32 cnt, s32 rtt_us)
 		return;
 
 	/* Discard delay samples right after fast recovery */
-	if (ca->epoch_start && (s32)(tcp_time_stamp - ca->epoch_start) < HZ)
+	if ((s32)(tcp_time_stamp - ca->epoch_start) < HZ)
 		return;
 
 	delay = (rtt_us << 3) / USEC_PER_MSEC;
@@ -460,7 +437,6 @@ static struct tcp_congestion_ops cubictcp __read_mostly = {
 	.cong_avoid	= bictcp_cong_avoid,
 	.set_state	= bictcp_state,
 	.undo_cwnd	= bictcp_undo_cwnd,
-	.cwnd_event	= bictcp_cwnd_event,
 	.pkts_acked     = bictcp_acked,
 	.owner		= THIS_MODULE,
 	.name		= "cubic",

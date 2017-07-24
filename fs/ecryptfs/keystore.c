@@ -1166,7 +1166,7 @@ decrypt_pki_encrypted_session_key(struct ecryptfs_auth_tok *auth_tok,
 	struct ecryptfs_message *msg = NULL;
 	char *auth_tok_sig = NULL;
 	char *payload = NULL;
-	size_t payload_len;
+	size_t payload_len = 0;
 	int rc;
 
 	rc = ecryptfs_get_auth_tok_sig(&auth_tok_sig, auth_tok);
@@ -1220,7 +1220,8 @@ decrypt_pki_encrypted_session_key(struct ecryptfs_auth_tok *auth_tok,
 out:
 	if (msg)
 		kfree(msg);
-	kfree(payload);
+	if (payload)
+		kfree(payload);
 	return rc;
 }
 
@@ -1911,7 +1912,7 @@ int ecryptfs_parse_packet_set(struct ecryptfs_crypt_stat *crypt_stat,
 					&packet_size);
 			if (rc) {
 				ecryptfs_printk(KERN_ERR, "Error parsing "
-						"dek packet %d\n", rc);
+						"dek packet\n");
 			rc = -EIO;
 			goto out_wipe_list;
 			}

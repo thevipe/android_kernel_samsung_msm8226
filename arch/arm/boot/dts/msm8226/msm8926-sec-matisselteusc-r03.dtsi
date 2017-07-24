@@ -169,6 +169,8 @@
 			reg = <0x1D>;
 			interrupt-parent = <&msmgpio>;
 			interrupts = <54 0>;
+			stm,scl = <&msmgpio 7 0>;
+			stm,sda = <&msmgpio 6 0>;
 			stm,irq_gpio = <&msmgpio 54 0x00>;
 			stm,reg_vdd = "8226_l19";
 			stm,reg_vio = "8226_lvs1";
@@ -249,7 +251,7 @@
 			label = "hall_flip";
 			gpios = <&msmgpio 110 0>;
 			linux,input-type = <1>;
-			linux,code = <0x0>;
+			linux,code = <0x15>;
 			gpio-key,wakeup;
 			debounce-interval = <15>;
 		};

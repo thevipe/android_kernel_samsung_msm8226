@@ -37,6 +37,9 @@
 
 #include "internal.h"
 #include "mount.h"
+#ifdef CONFIG_SDCARD_FS
+#include "sdcardfs/sdcardfs.h"
+#endif
 
 /* [Feb-1997 T. Schoebel-Theuer]
  * Fundamental changes in the pathname lookup mechanisms (namei)
@@ -480,7 +483,7 @@ static int unlazy_walk(struct nameidata *nd, struct dentry *dentry)
 	mntget(nd->path.mnt);
 
 	rcu_read_unlock();
-	br_read_unlock(&vfsmount_lock);
+	br_read_unlock(vfsmount_lock);
 	nd->flags &= ~LOOKUP_RCU;
 	return 0;
 
@@ -538,14 +541,14 @@ static int complete_walk(struct nameidata *nd)
 		if (unlikely(!__d_rcu_to_refcount(dentry, nd->seq))) {
 			spin_unlock(&dentry->d_lock);
 			rcu_read_unlock();
-			br_read_unlock(&vfsmount_lock);
+			br_read_unlock(vfsmount_lock);
 			return -ECHILD;
 		}
 		BUG_ON(nd->inode != dentry->d_inode);
 		spin_unlock(&dentry->d_lock);
 		mntget(nd->path.mnt);
 		rcu_read_unlock();
-		br_read_unlock(&vfsmount_lock);
+		br_read_unlock(vfsmount_lock);
 	}
 
 	if (likely(!(nd->flags & LOOKUP_JUMPED)))
@@ -706,31 +709,21 @@ static int follow_up_rcu(struct path *path)
 	return 1;
 }
 
-/*
- * follow_up - Find the mountpoint of path's vfsmount
- *
- * Given a path, find the mountpoint of its source file system.
- * Replace @path with the path of the mountpoint in the parent mount.
- * Up is towards /.
- *
- * Return 1 if we went up a level and 0 if we were already at the
- * root.
- */
 int follow_up(struct path *path)
 {
 	struct mount *mnt = real_mount(path->mnt);
 	struct mount *parent;
 	struct dentry *mountpoint;
 
-	br_read_lock(&vfsmount_lock);
+	br_read_lock(vfsmount_lock);
 	parent = mnt->mnt_parent;
 	if (&parent->mnt == path->mnt) {
-		br_read_unlock(&vfsmount_lock);
+		br_read_unlock(vfsmount_lock);
 		return 0;
 	}
 	mntget(&parent->mnt);
 	mountpoint = dget(mnt->mnt_mountpoint);
-	br_read_unlock(&vfsmount_lock);
+	br_read_unlock(vfsmount_lock);
 	dput(path->dentry);
 	path->dentry = mountpoint;
 	mntput(path->mnt);
@@ -990,7 +983,7 @@ failed:
 	if (!(nd->flags & LOOKUP_ROOT))
 		nd->root.mnt = NULL;
 	rcu_read_unlock();
-	br_read_unlock(&vfsmount_lock);
+	br_read_unlock(vfsmount_lock);
 	return -ECHILD;
 }
 
@@ -1300,7 +1293,7 @@ static void terminate_walk(struct nameidata *nd)
 		if (!(nd->flags & LOOKUP_ROOT))
 			nd->root.mnt = NULL;
 		rcu_read_unlock();
-		br_read_unlock(&vfsmount_lock);
+		br_read_unlock(vfsmount_lock);
 	}
 }
 
@@ -1653,7 +1646,7 @@ static int path_init(int dfd, const char *name, unsigned int flags,
 		nd->path = nd->root;
 		nd->inode = inode;
 		if (flags & LOOKUP_RCU) {
-			br_read_lock(&vfsmount_lock);
+			br_read_lock(vfsmount_lock);
 			rcu_read_lock();
 			nd->seq = __read_seqcount_begin(&nd->path.dentry->d_seq);
 		} else {
@@ -1666,7 +1659,7 @@ static int path_init(int dfd, const char *name, unsigned int flags,
 
 	if (*name=='/') {
 		if (flags & LOOKUP_RCU) {
-			br_read_lock(&vfsmount_lock);
+			br_read_lock(vfsmount_lock);
 			rcu_read_lock();
 			set_root_rcu(nd);
 		} else {
@@ -1679,7 +1672,7 @@ static int path_init(int dfd, const char *name, unsigned int flags,
 			struct fs_struct *fs = current->fs;
 			unsigned seq;
 
-			br_read_lock(&vfsmount_lock);
+			br_read_lock(vfsmount_lock);
 			rcu_read_lock();
 
 			do {
@@ -1715,7 +1708,7 @@ static int path_init(int dfd, const char *name, unsigned int flags,
 			if (fput_needed)
 				*fp = file;
 			nd->seq = __read_seqcount_begin(&nd->path.dentry->d_seq);
-			br_read_lock(&vfsmount_lock);
+			br_read_lock(vfsmount_lock);
 			rcu_read_lock();
 		} else {
 			path_get(&file->f_path);
@@ -1823,27 +1816,9 @@ static int do_path_lookup(int dfd, const char *name,
 	return retval;
 }
 
-/* does lookup, returns the object with parent locked */
-struct dentry *kern_path_locked(const char *name, struct path *path)
+int kern_path_parent(const char *name, struct nameidata *nd)
 {
-	struct nameidata nd;
-	struct dentry *d;
-	int err = do_path_lookup(AT_FDCWD, name, LOOKUP_PARENT, &nd);
-	if (err)
-		return ERR_PTR(err);
-	if (nd.last_type != LAST_NORM) {
-		path_put(&nd.path);
-		return ERR_PTR(-EINVAL);
-	}
-	mutex_lock_nested(&nd.path.dentry->d_inode->i_mutex, I_MUTEX_PARENT);
-	d = lookup_one_len(nd.last.name, nd.path.dentry, nd.last.len);
-	if (IS_ERR(d)) {
-		mutex_unlock(&nd.path.dentry->d_inode->i_mutex);
-		path_put(&nd.path);
-		return d;
-	}
-	*path = nd.path;
-	return d;
+	return do_path_lookup(AT_FDCWD, name, LOOKUP_PARENT, nd);
 }
 
 int kern_path(const char *name, unsigned int flags, struct path *path)
@@ -2813,8 +2788,6 @@ static long do_rmdir(int dfd, const char __user *pathname)
 	char * name;
 	struct dentry *dentry;
 	struct nameidata nd;
-	char *path_buf = NULL;
-	char *propagate_path = NULL;
 
 	error = user_path_parent(dfd, pathname, &nd, &name);
 	if (error)
@@ -2849,10 +2822,6 @@ static long do_rmdir(int dfd, const char __user *pathname)
 	error = security_path_rmdir(&nd.path, dentry);
 	if (error)
 		goto exit4;
-	if (nd.path.dentry->d_sb->s_op->unlink_callback) {
-		path_buf = kmalloc(PATH_MAX, GFP_KERNEL);
-		propagate_path = dentry_path_raw(dentry, path_buf, PATH_MAX);
-	}
 	error = vfs_rmdir(nd.path.dentry->d_inode, dentry);
 exit4:
 	mnt_drop_write(nd.path.mnt);
@@ -2860,14 +2829,6 @@ exit3:
 	dput(dentry);
 exit2:
 	mutex_unlock(&nd.path.dentry->d_inode->i_mutex);
-	if (path_buf && !error) {
-		nd.path.dentry->d_sb->s_op->unlink_callback(nd.path.dentry->d_sb,
-			propagate_path);
-	}
-	if (path_buf) {
-		kfree(path_buf);
-		path_buf = NULL;
-	}
 exit1:
 	path_put(&nd.path);
 	putname(name);
@@ -2917,15 +2878,18 @@ int vfs_unlink(struct inode *dir, struct dentry *dentry)
  * writeout happening, and we don't want to prevent access to the directory
  * while waiting on the I/O.
  */
-static long do_unlinkat(int dfd, const char __user *pathname)
+long do_unlinkat(int dfd, const char __user *pathname, bool propagate)
 {
 	int error;
 	char *name;
 	struct dentry *dentry;
 	struct nameidata nd;
 	struct inode *inode = NULL;
+#ifdef CONFIG_SDCARD_FS
+	/* temp code to avoid issue */
 	char *path_buf = NULL;
 	char *propagate_path = NULL;
+#endif
 
 	error = user_path_parent(dfd, pathname, &nd, &name);
 	if (error)
@@ -2947,10 +2911,20 @@ static long do_unlinkat(int dfd, const char __user *pathname)
 		inode = dentry->d_inode;
 		if (!inode)
 			goto slashes;
-		if (inode->i_sb->s_op->unlink_callback) {
-			path_buf = kmalloc(PATH_MAX, GFP_KERNEL);
-			propagate_path = dentry_path_raw(dentry, path_buf, PATH_MAX);
+#ifdef CONFIG_SDCARD_FS
+		/* temp code to avoid issue */
+		if (inode->i_sb->s_op->unlink_callback && propagate) {
+			struct inode *lower_inode = inode;
+			while (lower_inode->i_op->get_lower_inode) {
+				if (inode->i_sb->s_magic == SDCARDFS_SUPER_MAGIC
+						&& SDCARDFS_SB(inode->i_sb)->options.label) {
+					path_buf = kmalloc(PATH_MAX, GFP_KERNEL);
+					propagate_path = dentry_path_raw(dentry, path_buf, PATH_MAX);
+				}
+				lower_inode = lower_inode->i_op->get_lower_inode(lower_inode);
+			}
 		}
+#endif
 		ihold(inode);
 		error = mnt_want_write(nd.path.mnt);
 		if (error)
@@ -2965,13 +2939,13 @@ exit3:
 		dput(dentry);
 	}
 	mutex_unlock(&nd.path.dentry->d_inode->i_mutex);
-	if (path_buf && !error) {
-		inode->i_sb->s_op->unlink_callback(inode->i_sb, propagate_path);
-	}
-	if (path_buf) {
+#ifdef CONFIG_SDCARD_FS
+	/* temp code to avoid issue */
+	if (path_buf && !IS_ERR(path_buf) && !error && propagate) {
+		inode->i_sb->s_op->unlink_callback(inode, propagate_path);
 		kfree(path_buf);
-		path_buf = NULL;
 	}
+#endif
 	if (inode)
 		iput(inode);	/* truncate the inode here */
 exit1:
@@ -2993,12 +2967,12 @@ SYSCALL_DEFINE3(unlinkat, int, dfd, const char __user *, pathname, int, flag)
 	if (flag & AT_REMOVEDIR)
 		return do_rmdir(dfd, pathname);
 
-	return do_unlinkat(dfd, pathname);
+	return do_unlinkat(dfd, pathname, true);
 }
 
 SYSCALL_DEFINE1(unlink, const char __user *, pathname)
 {
-	return do_unlinkat(AT_FDCWD, pathname);
+	return do_unlinkat(AT_FDCWD, pathname, true);
 }
 
 int vfs_symlink(struct inode *dir, struct dentry *dentry, const char *oldname)

@@ -37,6 +37,7 @@
 #include <linux/mii.h>
 #include <linux/usb.h>
 #include <linux/crc32.h>
+#include <linux/if_vlan.h>
 
 #include "axusbnet.c"
 #include "asix.h"
@@ -3617,6 +3618,7 @@ static int ax_suspend(struct usb_interface *intf,
 }
 
 
+
 static int ax_resume(struct usb_interface *intf)
 {
 	struct usbnet *dev = usb_get_intfdata(intf);
@@ -3839,10 +3841,6 @@ static const struct usb_device_id products[] = {
 	/* ASIX AX88772A 10/100 */
 	USB_DEVICE(0x0db0, 0xA877),
 	.driver_info = (unsigned long) &ax88772a_info,
-}, {
-	// DLink DUB-E100 H/W Ver C1
-	USB_DEVICE (0x2001, 0x1a02),
-	.driver_info = (unsigned long) &ax88772_info,
 }, {
 	/* ASIX AX88772A 10/100 */
 	USB_DEVICE(0x0421, 0x772A),

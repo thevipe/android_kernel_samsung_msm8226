@@ -620,16 +620,14 @@ EXPORT_SYMBOL(mark_buffer_dirty_inode_sync);
 static void __set_page_dirty(struct page *page,
 		struct address_space *mapping, int warn)
 {
-	unsigned long flags;
-
-	spin_lock_irqsave(&mapping->tree_lock, flags);
+	spin_lock_irq(&mapping->tree_lock);
 	if (page->mapping) {	/* Race with truncate? */
 		WARN_ON_ONCE(warn && !PageUptodate(page));
 		account_page_dirtied(page, mapping);
 		radix_tree_tag_set(&mapping->page_tree,
 				page_index(page), PAGECACHE_TAG_DIRTY);
 	}
-	spin_unlock_irqrestore(&mapping->tree_lock, flags);
+	spin_unlock_irq(&mapping->tree_lock);
 	__mark_inode_dirty(mapping->host, I_DIRTY_PAGES);
 }
 
@@ -1048,6 +1046,9 @@ grow_buffers(struct block_device *bdev, sector_t block, int size)
 static struct buffer_head *
 __getblk_slow(struct block_device *bdev, sector_t block, int size)
 {
+	int ret;
+	struct buffer_head *bh;
+
 	/* Size must be multiple of hard sectorsize */
 	if (unlikely(size & (bdev_logical_block_size(bdev)-1) ||
 			(size < 512 || size > PAGE_SIZE))) {
@@ -1060,20 +1061,21 @@ __getblk_slow(struct block_device *bdev, sector_t block, int size)
 		return NULL;
 	}
 
-	for (;;) {
-		struct buffer_head *bh;
-		int ret;
+retry:
+	bh = __find_get_block(bdev, block, size);
+	if (bh)
+		return bh;
 
+	ret = grow_buffers(bdev, block, size);
+	if (ret == 0) {
+		free_more_memory();
+		goto retry;
+	} else if (ret > 0) {
 		bh = __find_get_block(bdev, block, size);
 		if (bh)
 			return bh;
-
-		ret = grow_buffers(bdev, block, size);
-		if (ret < 0)
-			return NULL;
-		if (ret == 0)
-			free_more_memory();
 	}
+	return NULL;
 }
 
 /*

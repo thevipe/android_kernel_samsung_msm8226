@@ -61,15 +61,6 @@ extern void __pgd_error(const char *file, int line, pgd_t);
 #define FIRST_USER_ADDRESS	PAGE_SIZE
 
 /*
- * Use TASK_SIZE as the ceiling argument for free_pgtables() and
- * free_pgd_range() to avoid freeing the modules pmd when LPAE is enabled (pmd
- * page shared between user and kernel).
- */
-#ifdef CONFIG_ARM_LPAE
-#define USER_PGTABLES_CEILING	TASK_SIZE
-#endif
-
-/*
  * The pgprot_* and protection_map entries will be fixed up in runtime
  * to include the cachable and bufferable bits based on memory policy,
  * as well as any architecture dependent bits like global/ASID and SMP
@@ -250,8 +241,8 @@ static inline void set_pte_at(struct mm_struct *mm, unsigned long addr,
 		__sync_icache_dcache(pteval);
 		ext |= PTE_EXT_NG;
 	}
-	
-		set_pte_ext(ptep, pteval, ext);
+
+	set_pte_ext(ptep, pteval, ext);
 }
 
 #ifdef CONFIG_TIMA_RKP_L2_GROUP

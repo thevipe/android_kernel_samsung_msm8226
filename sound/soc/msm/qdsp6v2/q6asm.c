@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2015, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2014, The Linux Foundation. All rights reserved.
  * Author: Brian Swetland <swetland@google.com>
  *
  * This software is licensed under the terms of the GNU General Public
@@ -47,7 +47,6 @@
 #define TRUE        0x01
 #define FALSE       0x00
 
-#define FRAME_NUM   (8)
 /* TODO, combine them together */
 static DEFINE_MUTEX(session_lock);
 struct asm_mmap {
@@ -384,14 +383,6 @@ static void q6asm_session_free(struct audio_client *ac)
 	ac->perf_mode = LEGACY_PCM_MODE;
 	ac->fptr_cache_ops = NULL;
 	return;
-}
-
-static uint32_t q6asm_get_next_buf(uint32_t curr_buf, uint32_t max_buf_cnt)
-{
-	pr_debug("%s: curr_buf = %d, max_buf_cnt = %d\n",
-		 __func__, curr_buf, max_buf_cnt);
-	curr_buf += 1;
-	return (curr_buf >= max_buf_cnt) ? 0 : curr_buf;
 }
 
 void send_asm_custom_topology(struct audio_client *ac)
@@ -970,9 +961,6 @@ int q6asm_audio_client_buf_alloc(unsigned int dir,
 			pr_debug("%s: buffer already allocated\n", __func__);
 			return 0;
 		}
-
-		if (bufcnt != FRAME_NUM)
-			goto fail;		
 		mutex_lock(&ac->cmd_lock);
 		buf = kzalloc(((sizeof(struct audio_buffer))*bufcnt),
 				GFP_KERNEL);
@@ -1063,12 +1051,6 @@ int q6asm_audio_client_buf_alloc_contiguous(unsigned int dir,
 
 	ac->port[dir].buf = buf;
 
-	/* check for integer overflow */
-	if ((bufcnt > 0) && ((INT_MAX / bufcnt) < bufsz)) {
-		pr_err("%s: integer overflow\n", __func__);
-		mutex_unlock(&ac->cmd_lock);
-		goto fail;
-	}
 	bytes_to_alloc = bufsz * bufcnt;
 
 	/* The size to allocate should be multiple of 4K bytes */
@@ -1566,8 +1548,7 @@ void *q6asm_is_cpu_buf_avail(int dir, struct audio_client *ac, uint32_t *size,
 		user accesses this function,increase cpu
 		buf(to avoid another api)*/
 		port->buf[idx].used = dir;
-		port->cpu_buf = q6asm_get_next_buf(port->cpu_buf,
-						   port->max_buf_cnt);
+		port->cpu_buf = ((port->cpu_buf + 1) & (port->max_buf_cnt - 1));
 		mutex_unlock(&port->lock);
 		return data;
 	}
@@ -1616,8 +1597,7 @@ void *q6asm_is_cpu_buf_avail_nolock(int dir, struct audio_client *ac,
 	 * buf(to avoid another api)
 	 */
 	port->buf[idx].used = dir;
-	port->cpu_buf = q6asm_get_next_buf(port->cpu_buf,
-					   port->max_buf_cnt);
+	port->cpu_buf = ((port->cpu_buf + 1) & (port->max_buf_cnt - 1));
 	return data;
 }
 
@@ -4142,8 +4122,7 @@ int q6asm_read(struct audio_client *ac)
 		read.buf_size = ab->size;
 		read.seq_id = port->dsp_buf;
 		read.hdr.token = port->dsp_buf;
-		port->dsp_buf = q6asm_get_next_buf(port->dsp_buf,
-						   port->max_buf_cnt);
+		port->dsp_buf = (port->dsp_buf + 1) & (port->max_buf_cnt - 1);
 		mutex_unlock(&port->lock);
 		pr_debug("%s:buf add[0x%x] token[%d] uid[%d]\n", __func__,
 						read.buf_addr_lsw,
@@ -4206,8 +4185,7 @@ int q6asm_read_nolock(struct audio_client *ac)
 			}
 		}
 
-		port->dsp_buf = q6asm_get_next_buf(port->dsp_buf,
-						   port->max_buf_cnt);
+		port->dsp_buf = (port->dsp_buf + 1) & (port->max_buf_cnt - 1);
 		pr_debug("%s:buf add[0x%x] token[%d] uid[%d]\n", __func__,
 					read.buf_addr_lsw,
 					read.hdr.token,
@@ -4398,8 +4376,7 @@ int q6asm_write(struct audio_client *ac, uint32_t len, uint32_t msw_ts,
 			write.flags = (0x00000000 | (flags & 0x800000FF));
 		else
 			write.flags = (0x80000000 | flags);
-		port->dsp_buf = q6asm_get_next_buf(port->dsp_buf,
-						   port->max_buf_cnt);
+		port->dsp_buf = (port->dsp_buf + 1) & (port->max_buf_cnt - 1);
 		buf_node = list_first_entry(&ac->port[IN].mem_map_handle,
 						struct asm_buffer_node,
 						list);
@@ -4470,8 +4447,7 @@ int q6asm_write_nolock(struct audio_client *ac, uint32_t len, uint32_t msw_ts,
 			write.flags = (0x00000000 | (flags & 0x800000FF));
 		else
 			write.flags = (0x80000000 | flags);
-		port->dsp_buf = q6asm_get_next_buf(port->dsp_buf,
-						   port->max_buf_cnt);
+		port->dsp_buf = (port->dsp_buf + 1) & (port->max_buf_cnt - 1);
 
 		pr_debug("%s:ab->phys[0x%x]bufadd[0x%x]token[0x%x] buf_id[0x%x]buf_size[0x%x]mmaphdl[0x%x]"
 							, __func__,

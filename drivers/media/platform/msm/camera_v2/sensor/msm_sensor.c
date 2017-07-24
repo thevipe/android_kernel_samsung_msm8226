@@ -468,9 +468,6 @@ static long msm_sensor_subdev_ioctl(struct v4l2_subdev *sd,
 			return s_ctrl->func_tbl->sensor_native_control(s_ctrl, argp);
 		else
 			pr_err("s_ctrl->func_tbl->sensor_native_control is NULL\n");
-	case VIDIOC_MSM_SENSOR_GET_EXIF_DATA:
-		    return s_ctrl->func_tbl->sensor_get_exif_data(s_ctrl, argp);
-
 	default:
 		return -ENOIOCTLCMD;
 	}

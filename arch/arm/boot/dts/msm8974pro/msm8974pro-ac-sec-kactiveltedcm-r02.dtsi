@@ -215,6 +215,7 @@
 		compatible = "sec-nfc";
 		sec-nfc,pon-gpio =      <&msmgpio 42 0x00>;
 		sec-nfc,rfs-gpio =      <&msmgpio 63 0x00>;
+		sec-nfc,tvdd-gpio =	<&msmgpio 41 0x00>;
 	};
 
 	sec_nfc_fn {

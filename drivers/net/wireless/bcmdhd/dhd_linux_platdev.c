@@ -45,7 +45,11 @@
 #define WLAN_PLAT_NODFS_FLAG    0x01
 #endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 58) */
 struct wifi_platform_data {
+#ifdef ENABLE_4335BT_WAR
+	int (*set_power)(int val,bool b0rev);
+#else
 	int (*set_power)(int val);
+#endif
 	int (*set_reset)(int val);
 	int (*set_carddetect)(int val);
 	void *(*mem_prealloc)(int section, unsigned long size);
@@ -84,6 +88,7 @@ extern void* wl_cfg80211_get_dhdp(void);
 extern int bcm_bt_lock(int cookie);
 extern void bcm_bt_unlock(int cookie);
 static int lock_cookie_wifi = 'W' | 'i'<<8 | 'F'<<16 | 'i'<<24;	/* cookie is "WiFi" */
+static bool is4335_revb0 = true;
 #endif /* ENABLE_4335BT_WAR */
 
 wifi_adapter_info_t* dhd_wifi_platform_get_adapter(uint32 bus_type, uint32 bus_num, uint32 slot_num)
@@ -170,7 +175,11 @@ int wifi_platform_set_power(wifi_adapter_info_t *adapter, bool on, unsigned long
 		}
 #endif /* ENABLE_4335BT_WAR */
 
+#ifdef ENABLE_4335BT_WAR
+		err = plat_data->set_power(on,is4335_revb0);
+#else
 		err = plat_data->set_power(on);
+#endif
 	}
 
 	if (msec && !err)
@@ -567,10 +576,7 @@ static int dhd_wifi_platform_load_sdio(void)
 			}
 			err = wifi_platform_set_power(adapter, TRUE, WIFI_TURNON_DELAY);
 			if (err) {
-				dhd_bus_unreg_sdio_notify();
-				/* WL_REG_ON state unknown, Power off forcely */
-				wifi_platform_set_power(adapter, FALSE, WIFI_TURNOFF_DELAY);
-				continue;
+				DHD_ERROR(("failed to set WIFI_REG_ON\n"));
 			} else {
 				wifi_platform_bus_enumerate(adapter, TRUE);
 				err = 0;

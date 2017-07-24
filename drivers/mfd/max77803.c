@@ -49,6 +49,13 @@ static struct mfd_cell max77803_devs[] = {
 	{ .name = "max77803-haptic", },
 };
 
+#if defined(CONFIG_EXTCON)
+struct max77803_muic_data max77803_muic = {
+	.usb_sel = 0,
+	.uart_sel = 0,
+};
+#endif
+
 int max77803_read_reg(struct i2c_client *i2c, u8 reg, u8 *dest)
 {
 	struct max77803_dev *max77803 = i2c_get_clientdata(i2c);

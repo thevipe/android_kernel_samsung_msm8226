@@ -217,6 +217,8 @@ in acl command list
 static struct cmd_map acl_map_table;
 static struct cmd_map elvss_map_table;
 static struct cmd_map aid_map_table;
+static struct dsi_cmd hsync_on_cmds;
+static struct dsi_cmd hsync_off_cmds;
 static struct candella_lux_map candela_map_table;
 static struct candella_lux_map candela_map_table_350;
 
@@ -2626,6 +2628,14 @@ static int mipi_samsung_disp_send_cmd(
 			cmd_desc = lcd_crack_rec_cmd_list.cmd_desc;
 			cmd_size = lcd_crack_rec_cmd_list.num_of_cmds;
 #endif
+		case PANEL_HSYNC_ON:
+			cmd_desc = hsync_on_cmds.cmd_desc;
+			cmd_size = hsync_on_cmds.num_of_cmds;
+			break;
+		case PANEL_HSYNC_OFF:
+			cmd_desc = hsync_off_cmds.cmd_desc;
+			cmd_size = hsync_off_cmds.num_of_cmds;
+			break;
 		default:
 			pr_err("%s : unknown_command.. \n", __func__);
 			goto unknown_command;
@@ -2691,6 +2701,33 @@ void mdss_dsi_panel_touchsensing(int enable)
 #endif
 }
 #endif
+
+void mdss_dsi_panel_hsync_onoff(bool onoff)
+{
+	struct msm_fb_data_type *mfd = msd.mfd;
+
+	if (mfd && mfd->panel_power_on/* && msd.dstat.on*/)
+	{
+		if( onoff )
+		{
+			msleep(30);
+			mipi_samsung_disp_send_cmd(PANEL_HSYNC_ON, true);
+			pr_info("%s : HSYNC On\n",__func__);
+		}
+		else
+		{
+			mipi_samsung_disp_send_cmd(PANEL_HSYNC_OFF, true);
+			msleep(10);
+			pr_info("%s : HSYNC Off\n",__func__);
+		}
+	}
+	else
+		pr_err("%s : panel power off\n",__func__);
+
+	return;
+}
+EXPORT_SYMBOL(mdss_dsi_panel_hsync_onoff);
+
 static int mdss_dsi_panel_registered(struct mdss_panel_data *pdata)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
@@ -3035,7 +3072,7 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 #endif
 
 	pr_info("mdss_dsi_panel_on DSI_MODE = %d ++\n",mipi->mode);
-	pr_debug("%s: ctrl=%pK ndx=%d\n", __func__, ctrl, ctrl->ndx);
+	pr_debug("%s: ctrl=%p ndx=%d\n", __func__, ctrl, ctrl->ndx);
 
 	if (!msd.manufacture_id)
 		msd.manufacture_id = mipi_samsung_manufacture_id(pdata);
@@ -3142,7 +3179,7 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 	pr_info("mdss_dsi_panel_off ++\n");
 	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
-	pr_debug("%s: ctrl=%pK ndx=%d\n", __func__, ctrl, ctrl->ndx);
+	pr_debug("%s: ctrl=%p ndx=%d\n", __func__, ctrl, ctrl->ndx);
 
 	mipi  = &pdata->panel_info.mipi;
 
@@ -4038,6 +4075,10 @@ static int mdss_panel_parse_dt(struct device_node *np,
 				"samsung,panel-nv-read-enable-cmds");
 	mdss_samsung_parse_panel_cmd(np, &nv_disable_cmds,
 				"samsung,panel-nv-read-disable-cmds");
+	mdss_samsung_parse_panel_cmd(np, &hsync_on_cmds,
+				"samsung,panel-hsync-on-cmds");
+	mdss_samsung_parse_panel_cmd(np, &hsync_off_cmds,
+				"samsung,panel-hsync-off-cmds");
 	mdss_samsung_parse_panel_cmd(np, &manufacture_id_cmds,
 				"samsung,panel-manufacture-id-read-cmds");
 #ifdef DEBUG_LDI_STATUS

@@ -310,6 +310,7 @@ static void control_init(sdp_fs_handler_control_t *con) {
 }
 
 static int __init sdp_fs_handler_mod_init(void) {
+
     g_sock = netlink_kernel_create(&init_net, SDP_FS_HANDLER_NETLINK, 0, recver, NULL, THIS_MODULE);
 
     if (!g_sock) {
